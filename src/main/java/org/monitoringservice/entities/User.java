@@ -2,36 +2,56 @@ package org.monitoringservice.entities;
 
 import lombok.Data;
 
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+
 /**
  * Класс, описывающий пользователя.
  */
 @Data
 public class User {
-    /** Поле логина. */
+    /**
+     * Поле логина.
+     */
     private String login;
-    /** Поле пароля. */
+    /**
+     * Поле пароля.
+     */
     private String password;
-    /** Поле роли в системе. */
+    /**
+     * Поле роли в системе.
+     */
     private Role role;
-    /** Поле города. */
+    /**
+     * Поле города.
+     */
     private String city;
-    /** Поле улицы. */
+    /**
+     * Поле улицы.
+     */
     private String street;
-    /** Поле номера дома. */
+    /**
+     * Поле номера дома.
+     */
     private int houseNumber;
-    /** Поле номера квартиры. */
+    /**
+     * Поле номера квартиры.
+     */
     private int apartmentNumber;
-    /** Поле со списком счетчиков. */
-    private ArrayList<Meter> meters;
+    /**
+     * Поле со списком счетчиков.
+     */
+    private HashMap<MeterType, LinkedList<Reading>> history;
+
     /**
      * Создание пользователя с определенными параметрами.
-     * @param login логин
-     * @param password пароль
-     * @param role роль в сервисе
-     * @param city город
-     * @param street улица
-     * @param houseNumber номер дома
+     *
+     * @param login           логин
+     * @param password        пароль
+     * @param role            роль в сервисе
+     * @param city            город
+     * @param street          улица
+     * @param houseNumber     номер дома
      * @param apartmentNumber номер квартиры
      */
     public User(String login, String password, Role role, String city, String street, int houseNumber, int apartmentNumber) {
@@ -42,6 +62,6 @@ public class User {
         this.street = street;
         this.houseNumber = houseNumber;
         this.apartmentNumber = apartmentNumber;
-        this.meters = new ArrayList<>();
+        this.history = new HashMap<>();
     }
 }

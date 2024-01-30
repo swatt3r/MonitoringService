@@ -1,24 +1,35 @@
 package org.monitoringservice.entities;
 
 import lombok.Data;
+
 /**
  * Класс, описывающий показание счетчика.
  */
 @Data
 public class Reading {
-    /** Поле дня. */
+    /**
+     * Поле дня.
+     */
     private int day;
-    /** Поле месяца. */
+    /**
+     * Поле месяца.
+     */
     private int month;
-    /** Поле года. */
+    /**
+     * Поле года.
+     */
     private int year;
-    /** Поле показания. */
+    /**
+     * Поле показания.
+     */
     private int readOut;
+
     /**
      * Создание показания с определенными параметрами.
-     * @param day день
-     * @param month месяц
-     * @param year год
+     *
+     * @param day     день
+     * @param month   месяц
+     * @param year    год
      * @param readOut показание
      */
     public Reading(int day, int month, int year, int readOut) {

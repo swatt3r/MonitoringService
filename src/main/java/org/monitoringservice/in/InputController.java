@@ -2,7 +2,7 @@ package org.monitoringservice.in;
 
 import org.monitoringservice.entities.Role;
 import org.monitoringservice.entities.User;
-import org.monitoringservice.repositories.UserRepo;
+import org.monitoringservice.repositories.UserRepository;
 import org.monitoringservice.services.AuthenticationService;
 import org.monitoringservice.services.MeterService;
 import org.monitoringservice.services.authexceptions.LoginException;
@@ -17,21 +17,29 @@ import java.util.Scanner;
  * Класс контроллера, отвечающего за входящий поток данных.
  */
 public class InputController {
-    /** Поле с сервисом авторизации и регистрации. */
+    /**
+     * Поле с сервисом авторизации и регистрации.
+     */
     private final AuthenticationService authService;
-    /** Поле с сервисом для работы со счетчиками и показаниями. */
+    /**
+     * Поле с сервисом для работы со счетчиками и показаниями.
+     */
     private final MeterService meterService;
-    /** Поле для хранения действий пользователей. */
+    /**
+     * Поле для хранения действий пользователей.
+     */
     private final LinkedList<String> audit;
+
     /**
      * Создание контроллера.
      */
     public InputController() {
-        UserRepo users = new UserRepo();
+        UserRepository users = new UserRepository();
         this.authService = new AuthenticationService(users);
         this.meterService = new MeterService(users);
         audit = new LinkedList<>();
     }
+
     /**
      * Метод считывания команд пользователя в начальном меню.
      */
@@ -54,6 +62,7 @@ public class InputController {
             }
         }
     }
+
     /**
      * Метод вывода начального меню в консоль.
      */
@@ -65,6 +74,7 @@ public class InputController {
                         "    - Зарегистрироваться в системе - /register\n" +
                         "    - Закрыть сервис - /exit");
     }
+
     /**
      * Метод вывода пользовательского меню в консоль.
      */
@@ -80,6 +90,7 @@ public class InputController {
                         "    - Ввести новое показание - /input\n" +
                         "    - Выйти из аккаунта - /logout");
     }
+
     /**
      * Метод вывода меню администратора в консоль.
      */
@@ -93,6 +104,7 @@ public class InputController {
                         "    - Добавить новый тип счетчиков - /newType\n" +
                         "    - Выйти из аккаунта - /logout");
     }
+
     /**
      * Метод считывания команд пользователя в пользовательском меню.
      */
@@ -127,6 +139,7 @@ public class InputController {
             }
         }
     }
+
     /**
      * Метод считывания команд администратора в меню администротора.
      */
@@ -155,8 +168,10 @@ public class InputController {
             }
         }
     }
+
     /**
      * Метод, обеспечивающий функцию добавления нового типа счетчика. Используется администратором
+     *
      * @param scanner - сканер, используется для считывания ввода с консоли
      */
     private void newType(Scanner scanner) {
@@ -169,8 +184,10 @@ public class InputController {
         meterService.addNewType(type);
         audit.add("Администротор добавил новый тип счетчиков");
     }
+
     /**
      * Метод, обеспечивающий функцию поиска и вывода актуальных показаний счетчиков пользователя.
+     *
      * @param user - пользователь
      */
     private void userActual(User user) {
@@ -184,8 +201,10 @@ public class InputController {
             System.out.println("Отсутствуют актуальные показания");
         }
     }
+
     /**
      * Метод, обеспечивающий функцию поиска и вывода актуальных показаний счетчиков пользователей. Используется администратором
+     *
      * @param scanner - сканер, используется для считывания ввода с консоли
      */
     private void adminActual(Scanner scanner) {
@@ -201,9 +220,11 @@ public class InputController {
             System.out.println("Отсутствуют показания или неверно указан логин.");
         }
     }
+
     /**
      * Метод, обеспечивающий функцию добавления нового счетчика пользователю.
-     * @param user - пользователь
+     *
+     * @param user    - пользователь
      * @param scanner - сканер, используется для считывания ввода с консоли
      */
     private void userAddMeter(User user, Scanner scanner) {
@@ -218,8 +239,10 @@ public class InputController {
             System.out.println(e.getMessage());
         }
     }
+
     /**
      * Метод, обеспечивающий функцию вывода списка счетчиков пользователя.
+     *
      * @param user - пользователь
      */
     private void showMeter(User user) {
@@ -234,9 +257,11 @@ public class InputController {
             System.out.println("У вас нет счетчиков.");
         }
     }
+
     /**
      * Метод, обеспечивающий функцию добавления нового показания пользователя.
-     * @param user - пользователь
+     *
+     * @param user    - пользователь
      * @param scanner - сканер, используется для считывания ввода с консоли
      */
     private void newReadout(User user, Scanner scanner) {
@@ -244,6 +269,7 @@ public class InputController {
         LinkedList<String> meters = meterService.getUserMeters(user);
         if (meters.isEmpty()) {
             System.out.println("Отсутствуют счетчики!");
+            return;
         }
         for (String type : meters) {
             System.out.print(" - " + type + "\n");
@@ -257,8 +283,10 @@ public class InputController {
             System.out.println(e.getMessage());
         }
     }
+
     /**
      * Метод, обеспечивающий функцию вывода истории показаний пользователя.
+     *
      * @param user - пользователь
      */
     private void userHistory(User user) {
@@ -272,8 +300,10 @@ public class InputController {
             System.out.println("Отсутствует история показаний!");
         }
     }
+
     /**
      * Метод, обеспечивающий функцию вывода истории показаний пользователей. Используется администратором
+     *
      * @param scanner - сканер, используется для считывания ввода с консоли
      */
     private void adminHistory(Scanner scanner) {
@@ -289,9 +319,11 @@ public class InputController {
             System.out.println("Отсутствуют показания или неверно указан логин.");
         }
     }
+
     /**
      * Метод, обеспечивающий функцию вывода истории показаний пользователя за месяц.
-     * @param user - пользователь
+     *
+     * @param user    - пользователь
      * @param scanner - сканер, используется для считывания ввода с консоли
      */
     private void userMonth(User user, Scanner scanner) {
@@ -317,8 +349,10 @@ public class InputController {
             System.out.println("Месяц указан неверно!");
         }
     }
+
     /**
      * Метод, обеспечивающий функцию вывода истории показаний пользователей за месяц. Используется администратором
+     *
      * @param scanner - сканер, используется для считывания ввода с консоли
      */
     private void adminMonth(Scanner scanner) {
@@ -342,21 +376,31 @@ public class InputController {
             System.out.println("Отсутствуют показания или неверно указан логин/месяц.");
         }
     }
+
     /**
      * Метод, обеспечивающий функцию авторизации пользователя.
+     *
      * @param scanner - сканер, используется для считывания ввода с консоли
      */
     private void login(Scanner scanner) {
         while (true) {
             System.out.print("Введите логин: ");
             String login = scanner.nextLine();
+
             System.out.print("Введите пароль: ");
             String password = scanner.nextLine();
             User user;
             try {
-                user = authService.tryToLogin(login, password);
+                user = authService.login(login, password);
             } catch (LoginException e) {
                 System.out.print(e.getMessage() + "\n");
+                System.out.println("Если желаете выйти из авторизации напишите - /quit.");
+                System.out.println("Если желаете продолжить любой другой ввод.");
+                String command = scanner.nextLine();
+                if (command.equals("/quit")) {
+                    System.out.println("Выход из меню авторизации.");
+                    break;
+                }
                 continue;
             }
             System.out.println("Успешная авторизация.");
@@ -369,56 +413,80 @@ public class InputController {
             break;
         }
     }
+
     /**
      * Метод, обеспечивающий функцию регистрации пользователя.
+     *
      * @param scanner - сканер, используется для считывания ввода с консоли
      */
     private void register(Scanner scanner) {
         while (true) {
-            System.out.print("Введите логин: ");
-            String login = scanner.nextLine();
-            if (login.length() < 3) {
-                System.out.println("Логин не может быть короче 3 символов");
-                continue;
+            String login = "";
+            while (login.length() < 3) {
+                System.out.print("Введите логин: ");
+                login = scanner.nextLine();
+                if (login.length() < 3) {
+                    System.out.println("Логин не может быть короче 3 символов");
+                }
             }
 
-            System.out.print("Введите пароль: ");
-            String password = scanner.nextLine();
-            if (password.length() < 5) {
-                System.out.println("Пароль не может быть короче 5 символов");
-                continue;
+            String password = "";
+            while (password.length() < 5) {
+                System.out.print("Введите пароль: ");
+                password = scanner.nextLine();
+                if (password.length() < 5) {
+                    System.out.println("Пароль не может быть короче 5 символов");
+                }
             }
 
-            System.out.print("Введите город: ");
-            String city = scanner.nextLine();
-            if (city.length() < 2) {
-                System.out.println("Название города не может быть короче 2 символов");
-                continue;
+            String city = "";
+            while (city.length() < 2) {
+                System.out.print("Введите название города: ");
+                city = scanner.nextLine();
+                if (city.length() < 2) {
+                    System.out.println("Название города не может быть короче 2 символов");
+                }
             }
 
-            System.out.print("Введите улицу: ");
-            String street = scanner.nextLine();
-            if (street.length() < 2) {
-                System.out.println("Название улицы не может быть короче 2 символов");
-                continue;
+            String street = "";
+            while (street.length() < 2) {
+                System.out.print("Введите название улицы: ");
+                street = scanner.nextLine();
+                if (street.length() < 2) {
+                    System.out.println("Название улицы не может быть короче 2 символов");
+                }
             }
 
-            System.out.print("Введите номер дома: ");
-            int houseNumber = Integer.parseInt(scanner.nextLine());
-            if (houseNumber < 1) {
-                System.out.println("Номер дома не может быть меньше 1");
-                continue;
+            int houseNumber = 0;
+            while (houseNumber < 1) {
+                System.out.print("Введите номер дома: ");
+                try {
+                    houseNumber = Integer.parseInt(scanner.nextLine());
+                }catch (NumberFormatException e){
+                    System.out.println("Введено не целое число!");
+                    continue;
+                }
+                if (houseNumber < 1) {
+                    System.out.println("Номер дома не может быть меньше 1");
+                }
             }
 
-            System.out.print("Введите номер квартиры: ");
-            int apartmentNumber = Integer.parseInt(scanner.nextLine());
-            if (apartmentNumber < 1) {
-                System.out.println("Номер квартиры не может быть меньше 1");
-                continue;
+            int apartmentNumber = 0;
+            while (apartmentNumber < 1) {
+                System.out.print("Введите номер квартиры: ");
+                try {
+                    apartmentNumber = Integer.parseInt(scanner.nextLine());
+                }catch (NumberFormatException e){
+                    System.out.println("Введено не целое число!");
+                    continue;
+                }
+                if (apartmentNumber < 1) {
+                    System.out.println("Номер квартиры не может быть меньше 1");
+                }
             }
 
             try {
-                authService.tryToRegister(login, password, Role.USER, city, street, houseNumber, apartmentNumber);
+                authService.register(login, password, Role.USER, city, street, houseNumber, apartmentNumber);
             } catch (RegistrationException | NumberFormatException e) {
                 System.out.print(e.getMessage() + "\n");
                 continue;

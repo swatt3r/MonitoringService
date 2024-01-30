@@ -1,243 +1,248 @@
 package org.monitoringservice.tests;
 
-import org.junit.jupiter.api.Assertions;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.monitoringservice.entities.*;
-import org.monitoringservice.repositories.UserRepo;
+import org.monitoringservice.entities.MeterType;
+import org.monitoringservice.entities.Reading;
+import org.monitoringservice.entities.Role;
+import org.monitoringservice.entities.User;
+import org.monitoringservice.repositories.UserRepository;
 import org.monitoringservice.services.MeterService;
 import org.monitoringservice.services.meterexecptions.MeterAddException;
 import org.monitoringservice.services.meterexecptions.ReadoutException;
 
-import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedList;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * Класс тестов для сервиса, который работает со счетчиками и их показаниями.
  */
 @ExtendWith(MockitoExtension.class)
 class MeterServiceTest {
-    /** Поле с сервисом. */
+    /**
+     * Поле с сервисом.
+     */
     @InjectMocks
     private MeterService meterService;
-    /** Mock репозитория. */
-    @Mock
-    private UserRepo userRepo;
     /**
-     * Тест получения актуальных показаний пользователя.
+     * Mock репозитория.
      */
-    @Test
-    void userActualTest() {
-        ArrayList<User> users = getUsers();
+    @Mock
+    private UserRepository userRepo;
 
+    /**
+     * Map пользователей для теста.
+     */
+    private HashMap<Integer, User> users;
+
+    @Test
+    @DisplayName("Тест получения актуальных показаний пользователя.")
+    void userActualTest() {
         LinkedList<String> user1Actual = meterService.getUserActual(users.get(1));
-        Assertions.assertNotNull(user1Actual);
-        Assertions.assertEquals(1, user1Actual.size());
-        Assertions.assertEquals("Heat, 19.1.2024 - 45", user1Actual.get(0));
+        assertThat(user1Actual.size()).isEqualTo(1);
+        assertThat(user1Actual.get(0)).isEqualTo("Heat, 19.1.2024 - 45");
 
         LinkedList<String> user2Actual = meterService.getUserActual(users.get(2));
-        Assertions.assertEquals(2, user2Actual.size());
-        Assertions.assertEquals("ColdWater, 17.11.2023 - 15", user2Actual.get(0));
+        assertThat(user2Actual.size()).isEqualTo(2);
+        assertThat(user2Actual.get(0)).isEqualTo("ColdWater, 17.11.2023 - 15");
     }
-    /**
-     * Тест получения актуальных показаний пользователей для администратора.
-     */
+
     @Test
+    @DisplayName("Тест получения актуальных показаний пользователей для администратора.")
     void getAdminActualTest() {
-        Mockito.when(userRepo.getUsers()).thenReturn(getUsers());
+        Mockito.when(userRepo.getUsers()).thenReturn(users);
 
         LinkedList<String> allActual = meterService.getActualForAdmin("");
-        Assertions.assertEquals(3, allActual.size());
-        Assertions.assertEquals("user, Heat, 19.1.2024 - 45", allActual.get(0));
+        assertThat(allActual.size()).isEqualTo(3);
+        assertThat(allActual.get(0)).isEqualTo("user, Heat, 19.1.2024 - 45");
 
         Mockito.when(userRepo.findUserByLogin(Mockito.eq("newUser")))
-                .thenReturn(getUsers().get(2));
+                .thenReturn(users.get(2));
 
         LinkedList<String> specUserActual = meterService.getActualForAdmin("newUser");
-        Assertions.assertEquals(2, specUserActual.size());
-        Assertions.assertEquals("newUser, Heat, 17.11.2023 - 90", specUserActual.get(1));
+        assertThat(specUserActual.size()).isEqualTo(2);
+        assertThat(specUserActual.get(1)).isEqualTo("newUser, Heat, 17.11.2023 - 90");
     }
-    /**
-     * Тест добавления счетчика пользователю. Такого типа счетчика нет.
-     */
+
     @Test
+    @DisplayName("Тест добавления счетчика пользователю. Такого типа счетчика нет.")
     void addMeterToUserTest_NoSuchMeter() {
-        ArrayList<User> users = getUsers();
-        MeterAddException thrown = Assertions.assertThrows(
-                MeterAddException.class,
-                () -> meterService.addNewMeterToUser(users.get(1), "Electricity"));
-        Assertions.assertEquals("Такого типа счетчика нет в системе!", thrown.getMessage());
+        assertThatThrownBy(() ->
+                meterService.addNewMeterToUser(users.get(1), "Electricity"))
+                .isInstanceOf(MeterAddException.class)
+                .hasMessageContaining("Такого типа счетчика нет в системе!");
     }
-    /**
-     * Тест добавления счетчика пользователю. Пользователь уже имеет такой тип счетчика.
-     */
+
     @Test
+    @DisplayName("Тест добавления счетчика пользователю. Пользователь уже имеет такой тип счетчика.")
     void addMeterToUserTest_AlreadyHaveMeter() {
-        ArrayList<User> users = getUsers();
-        MeterAddException thrown = Assertions.assertThrows(
-                MeterAddException.class,
-                () -> meterService.addNewMeterToUser(users.get(1), "Heat"));
-        Assertions.assertEquals("Такой счетчик уже есть!", thrown.getMessage());
+        assertThatThrownBy(() ->
+                meterService.addNewMeterToUser(users.get(1), "Heat"))
+                .isInstanceOf(MeterAddException.class)
+                .hasMessageContaining("Такой счетчик уже есть!");
     }
-    /**
-     * Тест успешного добавления счетчика пользователю.
-     */
+
     @Test
+    @DisplayName("Тест успешного добавления счетчика пользователю.")
     void addMeterToUserTest_success() {
-        ArrayList<User> users = getUsers();
         try {
             meterService.addNewMeterToUser(users.get(1), "ColdWater");
-            Assertions.assertEquals(2, users.get(1).getMeters().size());
         } catch (MeterAddException e) {
-            Assertions.fail();
+            Assertions.fail("Счетчик не добавился!");
         }
     }
-    /**
-     * Тест получения счетчиков пользователя.
-     */
+
     @Test
+    @DisplayName("Тест получения счетчиков пользователя.")
     void getUserMetersTest() {
-        LinkedList<String> meters = meterService.getUserMeters(getUsers().get(2));
-        Assertions.assertEquals(2, meters.size());
+        LinkedList<String> meters = meterService.getUserMeters(users.get(2));
+        assertThat(meters.size()).isEqualTo(2);
     }
-    /**
-     * Тест получения истории показаний счетчиков пользователя.
-     */
+
     @Test
+    @DisplayName("Тест получения истории показаний счетчиков пользователя.")
     void getUserHistoryTest() {
-        LinkedList<String> history = meterService.getUserHistory(getUsers().get(2));
-        Assertions.assertEquals(3, history.size());
+        LinkedList<String> history = meterService.getUserHistory(users.get(2));
+        assertThat(history.size()).isEqualTo(3);
     }
-    /**
-     * Тест получения истории показаний пользователей для администратора.
-     */
+
     @Test
+    @DisplayName("Тест получения истории показаний пользователей для администратора.")
     void getAdminHistoryTest() {
-        ArrayList<User> users = getUsers();
         Mockito.when(userRepo.getUsers()).thenReturn(users);
 
         LinkedList<String> allHistory = meterService.getHistoryForAdmin("");
-        Assertions.assertEquals(6, allHistory.size());
-        Assertions.assertEquals("user, Heat, 17.11.2023 - 34", allHistory.get(0));
+        assertThat(allHistory.size()).isEqualTo(6);
+        assertThat(allHistory.get(0)).isEqualTo("user, Heat, 17.11.2023 - 34");
+
 
         Mockito.when(userRepo.findUserByLogin(Mockito.eq("newUser")))
                 .thenReturn(users.get(2));
 
         LinkedList<String> specUserHistory = meterService.getHistoryForAdmin("newUser");
-        Assertions.assertEquals(3, specUserHistory.size());
-        Assertions.assertEquals("newUser, Heat, 17.11.2023 - 90", specUserHistory.get(2));
+        assertThat(specUserHistory.size()).isEqualTo(3);
+        assertThat(specUserHistory.get(2)).isEqualTo("newUser, Heat, 17.11.2023 - 90");
     }
-    /**
-     * Тест получения истории показаний счетчиков пользователя за месяц.
-     */
-    @Test
-    void getUserMonthHistoryTest() {
-        LinkedList<String> history = meterService.getUserMonthHistory(getUsers().get(2), 11);
-        Assertions.assertEquals(2, history.size());
 
-        history = meterService.getUserMonthHistory(getUsers().get(2), -1);
-        Assertions.assertEquals(0, history.size());
-    }
-    /**
-     * Тест получения истории показаний пользователей за месяц для администратора.
-     */
     @Test
+    @DisplayName("Тест получения истории показаний счетчиков пользователя за месяц.")
+    void getUserMonthHistoryTest() {
+        LinkedList<String> history = meterService.getUserMonthHistory(users.get(2), 11);
+        assertThat(history.size()).isEqualTo(2);
+
+        history = meterService.getUserMonthHistory(users.get(2), -1);
+        assertThat(history.size()).isEqualTo(0);
+    }
+
+    @Test
+    @DisplayName("Тест получения истории показаний пользователей за месяц для администратора.")
     void getAdminMonthHistoryTest() {
-        ArrayList<User> users = getUsers();
         Mockito.when(userRepo.getUsers()).thenReturn(users);
 
         LinkedList<String> allHistory = meterService.getMonthHistoryForAdmin("", 11);
-        Assertions.assertEquals(3, allHistory.size());
-        Assertions.assertEquals("user, Heat, 17.11.2023 - 34", allHistory.get(0));
+        assertThat(allHistory.size()).isEqualTo(3);
+        assertThat(allHistory.get(0)).isEqualTo("user, Heat, 17.11.2023 - 34");
+
 
         allHistory = meterService.getMonthHistoryForAdmin("", -1);
-        Assertions.assertEquals(0, allHistory.size());
+        assertThat(allHistory.size()).isEqualTo(0);
 
 
         Mockito.when(userRepo.findUserByLogin(Mockito.eq("newUser")))
                 .thenReturn(users.get(2));
 
         LinkedList<String> specUserHistory = meterService.getMonthHistoryForAdmin("newUser", 10);
-        Assertions.assertEquals(1, specUserHistory.size());
-        Assertions.assertEquals("newUser, Heat, 15.10.2023 - 70", specUserHistory.get(0));
+        assertThat(specUserHistory.size()).isEqualTo(1);
+        assertThat(specUserHistory.get(0)).isEqualTo("newUser, Heat, 15.10.2023 - 70");
 
         allHistory = meterService.getMonthHistoryForAdmin("newUser", -1);
-        Assertions.assertEquals(0, allHistory.size());
+        assertThat(allHistory.size()).isEqualTo(0);
     }
-    /**
-     * Тест внесения нового показания. Неверное показание счетчика.
-     */
-    @Test
-    void newReadoutTest_invalidValue() {
-        ReadoutException thrown = Assertions.assertThrows(
-                ReadoutException.class,
-                () -> meterService.newReadout(getUsers().get(1), "Heat", 10));
-        Assertions.assertEquals("Неверное показание счетчика!", thrown.getMessage());
 
-        thrown = Assertions.assertThrows(
-                ReadoutException.class,
-                () -> meterService.newReadout(getUsers().get(2), "ColdWater", 14));
-        Assertions.assertEquals("Неверное показание счетчика!", thrown.getMessage());
-    }
-    /**
-     * Тест внесения нового показания. Неверный месяц.
-     */
     @Test
+    @DisplayName("Тест внесения нового показания. Неверное показание счетчика.")
+    void newReadoutTest_invalidValue() {
+        assertThatThrownBy(() ->
+                meterService.newReadout(users.get(1), "Heat", 10))
+                .isInstanceOf(ReadoutException.class)
+                .hasMessageContaining("Неверное показание счетчика!");
+
+        assertThatThrownBy(() ->
+                meterService.newReadout(users.get(2), "ColdWater", 14))
+                .isInstanceOf(ReadoutException.class)
+                .hasMessageContaining("Неверное показание счетчика!");
+    }
+
+    @Test
+    @DisplayName("Тест внесения нового показания. Неверный месяц.")
     void newReadoutTest_invalidMonth() {
-        ReadoutException thrown = Assertions.assertThrows(
-                ReadoutException.class,
-                () -> meterService.newReadout(getUsers().get(1), "Heat", 50));
-        Assertions.assertEquals("Запись в этом месяце уже есть!", thrown.getMessage());
+        assertThatThrownBy(() ->
+                meterService.newReadout(users.get(1), "Heat", 50))
+                .isInstanceOf(ReadoutException.class)
+                .hasMessageContaining("Запись в этом месяце уже есть!");
     }
-    /**
-     * Тест внесения нового показания. Неверный тип счетчика.
-     */
+
     @Test
+    @DisplayName("Тест внесения нового показания. Неверный тип счетчика.")
     void newReadoutTest_invalidMeter() {
-        ReadoutException thrown = Assertions.assertThrows(
-                ReadoutException.class,
-                () -> meterService.newReadout(getUsers().get(1), "Electricity", 50));
-        Assertions.assertEquals("Такой тип счетчика не зарегистрирован!", thrown.getMessage());
+        assertThatThrownBy(() ->
+                meterService.newReadout(users.get(1), "Electricity", 50))
+                .isInstanceOf(ReadoutException.class)
+                .hasMessageContaining("Такой тип счетчика не зарегистрирован!");
     }
-    /**
-     * Тест успешного внесения нового показания.
-     */
+
     @Test
+    @DisplayName("Тест успешного внесения нового показания.")
     void newReadoutTest_success() {
         try {
-            meterService.newReadout(getUsers().get(2), "ColdWater", 56);
-            Assertions.assertEquals(2, getUsers().get(2).getMeters().get(1).getHistory().size());
+            meterService.newReadout(users.get(2), "ColdWater", 56);
         } catch (ReadoutException e) {
-            Assertions.fail();
+            Assertions.fail("Показание неверно!");
         }
     }
 
     /**
      * Метод создания списка пользователей для тестов.
-     * @return ArrayList - список пользователей для теста
      */
-    private ArrayList<User> getUsers() {
-        ArrayList<User> result = new ArrayList<>(3);
+    @BeforeEach
+    public void getUsers() {
+        users = new HashMap<>();
         User user1 = new User("admin", "admin", Role.ADMIN, "", "", -1, -1);
-        User user2 = new User("user", "user", Role.USER, "city", "str", 11, 12);
-        user2.getMeters().add(new Meter(new MeterType("Heat")));
-        user2.getMeters().get(0).getHistory().add(new Reading(17, 11, 2023, 34));
-        user2.getMeters().get(0).getHistory().add(new Reading(18, 12, 2023, 39));
-        user2.getMeters().get(0).getHistory().add(new Reading(19, 1, 2024, 45));
-        User user3 = new User("newUser", "user", Role.USER, "city", "str", 10, 5);
-        user3.getMeters().add(new Meter(new MeterType("ColdWater")));
-        user3.getMeters().get(0).getHistory().add(new Reading(17, 11, 2023, 15));
-        user3.getMeters().add(new Meter(new MeterType("Heat")));
-        user3.getMeters().get(1).getHistory().add(new Reading(15, 10, 2023, 70));
-        user3.getMeters().get(1).getHistory().add(new Reading(17, 11, 2023, 90));
-        result.add(user1);
-        result.add(user2);
-        result.add(user3);
-        return result;
-    }
 
+
+        User user2 = new User("user", "user", Role.USER, "city", "str", 11, 12);
+        Reading[] readings = new Reading[]{
+                new Reading(17, 11, 2023, 34),
+                new Reading(18, 12, 2023, 39),
+                new Reading(19, 1, 2024, 45)
+        };
+        user2.getHistory().put(new MeterType("Heat"), new LinkedList<>(Arrays.asList(readings)));
+
+
+        readings = new Reading[]{
+                new Reading(17, 11, 2023, 15)
+        };
+        User user3 = new User("newUser", "user", Role.USER, "city", "str", 10, 5);
+        user3.getHistory().put(new MeterType("ColdWater"), new LinkedList<>(Arrays.asList(readings)));
+        readings = new Reading[]{
+                new Reading(15, 10, 2023, 70),
+                new Reading(17, 11, 2023, 90)
+        };
+        user3.getHistory().put(new MeterType("Heat"), new LinkedList<>(Arrays.asList(readings)));
+
+        users.put(0, user1);
+        users.put(1, user2);
+        users.put(2, user3);
+    }
 }

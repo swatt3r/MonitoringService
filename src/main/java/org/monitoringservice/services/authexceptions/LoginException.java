@@ -1,4 +1,5 @@
 package org.monitoringservice.services.authexceptions;
+
 /**
  * Класс исключения. Возникает при авторизации.
  */
