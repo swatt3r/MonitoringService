@@ -209,23 +209,35 @@ public class MeterService {
             LinkedList<Reading> history = user.getHistory().get(new MeterType(type));
             try {
                 Reading lastRead = history.getLast();
+
                 if (value <= lastRead.getReadOut()) {
                     throw new ReadoutException("Неверное показание счетчика!");
                 }
 
-                Calendar rightNow = Calendar.getInstance();
-                if (rightNow.get(Calendar.MONTH) + 1 > lastRead.getMonth() || rightNow.get(Calendar.YEAR) > lastRead.getYear()) {
-                    history.add(new Reading(rightNow.get(Calendar.DAY_OF_MONTH), rightNow.get(Calendar.MONTH) + 1, rightNow.get(Calendar.YEAR), value));
+                int[] date = getCurrentDate();
+                if (date[1] + 1 > lastRead.getMonth() || date[2] > lastRead.getYear()) {
+                    history.add(new Reading(date[0], date[1] + 1, date[2], value));
                 } else {
                     throw new ReadoutException("Запись в этом месяце уже есть!");
                 }
+
             } catch (NoSuchElementException e) {
-                Calendar rightNow = Calendar.getInstance();
-                history.add(new Reading(rightNow.get(Calendar.DAY_OF_MONTH), rightNow.get(Calendar.MONTH) + 1, rightNow.get(Calendar.YEAR), value));
+                int[] date = getCurrentDate();
+                history.add(new Reading(date[0], date[1] + 1, date[2], value));
             }
             return;
         }
         throw new ReadoutException("Такой тип счетчика не зарегистрирован!");
+    }
+
+    /**
+     * Метод получения текущей даты.
+     *
+     * @return int[] - массив, состоящий из дня, месяца и года.
+     */
+    private int[] getCurrentDate() {
+        Calendar rightNow = Calendar.getInstance();
+        return new int[]{rightNow.get(Calendar.DAY_OF_MONTH), rightNow.get(Calendar.MONTH), rightNow.get(Calendar.YEAR)};
     }
 
     /**
