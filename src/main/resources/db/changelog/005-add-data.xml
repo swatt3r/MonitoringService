@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="005-add-data" author="swatter">
+        <insert tableName="roles" schemaName="monitoring">
+            <column name="role" value="ADMIN"/>
+        </insert>
+        <insert tableName="roles" schemaName="monitoring">
+            <column name="role" value="USER"/>
+        </insert>
+        <insert tableName="meter_types" schemaName="monitoring">
+            <column name="type" value="Heat"/>
+        </insert>
+        <insert tableName="meter_types" schemaName="monitoring">
+            <column name="type" value="ColdWater"/>
+        </insert>
+        <insert tableName="meter_types" schemaName="monitoring">
+            <column name="type" value="HotWater"/>
+        </insert>
+        <insert tableName="users" schemaName="monitoring">
+            <column name="login" value="admin"/>
+            <column name="password" value="admin"/>
+            <column name="role" value="ADMIN"/>
+            <column name="city" value=""/>
+            <column name="street" value=""/>
+            <column name="apartment" valueNumeric="-1"/>
+            <column name="house" valueNumeric="-1"/>
+        </insert>
+    </changeSet>
+</databaseChangeLog>

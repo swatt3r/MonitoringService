@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="004-foreign-keys" author="swatter">
+        <addForeignKeyConstraint baseTableName="meter_history" baseColumnNames="user_id"
+                                 constraintName="fk_meter_user"
+                                 referencedTableName="users" referencedColumnNames="id" onDelete="CASCADE"/>
+
+        <addForeignKeyConstraint baseTableName="meter_history" baseColumnNames="type"
+                                 constraintName="fk_meter_type"
+                                 referencedTableName="meter_types" referencedColumnNames="type" onDelete="CASCADE"/>
+
+        <addForeignKeyConstraint baseTableName="user" baseColumnNames="role"
+                                 constraintName="fk_user_role"
+                                 referencedTableName="roles" referencedColumnNames="role" onDelete="CASCADE"/>
+    </changeSet>
+</databaseChangeLog>
