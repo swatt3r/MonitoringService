@@ -39,7 +39,7 @@ class AuthServiceTest {
     @DisplayName("Тест авторизации с неправильным паролем.")
     void tryToLoginTest_wrongPassword() {
         Mockito.when(userRepo.findUserByLogin(Mockito.eq("admin")))
-                .thenReturn(new User("admin", "admin", Role.ADMIN, "", "", -1, -1));
+                .thenReturn(new User(1, "admin", "admin", Role.ADMIN, "", "", -1, -1));
         assertThatThrownBy(() ->
                 authService.login("admin", "user"))
                 .isInstanceOf(LoginException.class)
@@ -60,7 +60,7 @@ class AuthServiceTest {
     @DisplayName("Тест успешной авторизации.")
     void tryToLoginTest_success() {
         Mockito.when(userRepo.findUserByLogin(Mockito.eq("admin")))
-                .thenReturn(new User("admin", "admin", Role.ADMIN, "", "", -1, -1));
+                .thenReturn(new User(1, "admin", "admin", Role.ADMIN, "", "", -1, -1));
         try {
             assertThat(authService.login("admin", "admin")).isEqualTo(userRepo.findUserByLogin("admin"));
         } catch (LoginException e) {
@@ -72,7 +72,7 @@ class AuthServiceTest {
     @DisplayName("Тест регистрации с уже существующим логином.")
     void tryToRegisterTest_sameLogin() {
         Mockito.when(userRepo.findUserByLogin(Mockito.eq("user")))
-                .thenReturn(new User("user", "user", Role.USER, "city", "str", 11, 12));
+                .thenReturn(new User(1, "user", "user", Role.USER, "city", "str", 11, 12));
 
         assertThatThrownBy(() ->
                 authService.register("user", "user", Role.USER, "city", "str", 11, 12))
@@ -84,7 +84,7 @@ class AuthServiceTest {
     @DisplayName("Тест регистрации с уже существующим адресом.")
     void tryToRegisterTest_sameAddress() {
         Mockito.when(userRepo.findUserByFullAddress("city", "str", 11, 12))
-                .thenReturn(new User("user", "user", Role.USER, "city", "str", 11, 12));
+                .thenReturn(new User(1, "user", "user", Role.USER, "city", "str", 11, 12));
         assertThatThrownBy(() ->
                 authService.register("newUser", "user", Role.USER, "city", "str", 11, 12))
                 .isInstanceOf(RegistrationException.class)

@@ -2,23 +2,25 @@ package org.monitoringservice.entities;
 
 import lombok.Data;
 
+import java.util.Date;
+
 /**
  * Класс, описывающий показание счетчика.
  */
 @Data
 public class Reading {
     /**
-     * Поле дня.
+     * Поле уникального идентификатора пользователя.
      */
-    private int day;
+    private int userId;
     /**
-     * Поле месяца.
+     * Поле типа счетчика.
      */
-    private int month;
+    private String type;
     /**
-     * Поле года.
+     * Поле даты.
      */
-    private int year;
+    private Date date;
     /**
      * Поле показания.
      */
@@ -27,15 +29,13 @@ public class Reading {
     /**
      * Создание показания с определенными параметрами.
      *
-     * @param day     день
-     * @param month   месяц
-     * @param year    год
+     *
      * @param readOut показание
      */
-    public Reading(int day, int month, int year, int readOut) {
-        this.day = day;
-        this.month = month;
-        this.year = year;
+    public Reading(int id, String type,Date date, int readOut) {
+        this.userId = id;
+        this.type = type;
+        this.date = date;
         this.readOut = readOut;
     }
 }

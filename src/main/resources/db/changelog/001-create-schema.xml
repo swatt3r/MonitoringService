@@ -6,7 +6,7 @@
 
     <changeSet id="001-create-schema" author="swatter">
         <sql>
-            CREATE SCHEMA monitoring;
+            CREATE SCHEMA IF NOT EXISTS monitoring;
         </sql>
     </changeSet>
 </databaseChangeLog>

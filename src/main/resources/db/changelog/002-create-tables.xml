@@ -5,9 +5,16 @@
                    https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
     <changeSet id="003-create-tables" author="swatter">
+        <createSequence
+                schemaName="monitoring"
+                sequenceName="monitor_sequence"
+                incrementBy="1"
+                maxValue="10000"
+                startValue="1"
+        />
         <createTable tableName="users" schemaName="monitoring">
             <column name="id" type="BIGINT"
-                    defaultValueComputed="nextval('sequence')">
+                    defaultValueComputed="nextval('monitoring.monitor_sequence')">
                 <constraints primaryKey="true" nullable="false" />
             </column>
             <column name="login" type="VARCHAR(255)">
@@ -39,7 +46,7 @@
             <column name="type" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>
-            <column name="time" type="TIME">
+            <column name="date" type="DATE">
                 <constraints nullable="false"/>
             </column>
             <column name="value" type="INTEGER">
@@ -54,6 +61,14 @@
         <createTable tableName="roles" schemaName="monitoring">
             <column name="role" type="VARCHAR(255)">
                 <constraints primaryKey="true" nullable="false"  unique="true"/>
+            </column>
+        </createTable>
+        <createTable tableName="users_meters" schemaName="monitoring">
+            <column name="user_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="type" type="VARCHAR(255)">
+                <constraints nullable="false"/>
             </column>
         </createTable>
     </changeSet>

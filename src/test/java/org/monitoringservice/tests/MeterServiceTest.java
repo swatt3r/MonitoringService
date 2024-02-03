@@ -218,10 +218,10 @@ class MeterServiceTest {
     @BeforeEach
     public void getUsers() {
         users = new HashMap<>();
-        User user1 = new User("admin", "admin", Role.ADMIN, "", "", -1, -1);
+        User user1 = new User(1, "admin", "admin", Role.ADMIN, "", "", -1, -1);
 
 
-        User user2 = new User("user", "user", Role.USER, "city", "str", 11, 12);
+        User user2 = new User(2, "user", "user", Role.USER, "city", "str", 11, 12);
         Reading[] readings = new Reading[]{
                 new Reading(17, 11, 2023, 34),
                 new Reading(18, 12, 2023, 39),
@@ -233,7 +233,7 @@ class MeterServiceTest {
         readings = new Reading[]{
                 new Reading(17, 11, 2023, 15)
         };
-        User user3 = new User("newUser", "user", Role.USER, "city", "str", 10, 5);
+        User user3 = new User(3, "newUser", "user", Role.USER, "city", "str", 10, 5);
         user3.getHistory().put(new MeterType("ColdWater"), new LinkedList<>(Arrays.asList(readings)));
         readings = new Reading[]{
                 new Reading(15, 10, 2023, 70),

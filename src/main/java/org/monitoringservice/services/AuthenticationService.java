@@ -65,7 +65,7 @@ public class AuthenticationService {
 
         regUser = userRepo.findUserByFullAddress(city, street, houseNumber, apartmentNumber);
         if (regUser == null) {
-            userRepo.save(new User(login, password, role, city, street, houseNumber, apartmentNumber));
+            userRepo.save(new User(-1, login, password, role, city, street, houseNumber, apartmentNumber));
         } else {
             throw new RegistrationException("Пользователь с данным адресом уже существует!");
         }

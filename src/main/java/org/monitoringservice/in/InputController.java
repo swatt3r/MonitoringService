@@ -2,6 +2,7 @@ package org.monitoringservice.in;
 
 import org.monitoringservice.entities.Role;
 import org.monitoringservice.entities.User;
+import org.monitoringservice.repositories.MeterRepository;
 import org.monitoringservice.repositories.UserRepository;
 import org.monitoringservice.services.AuthenticationService;
 import org.monitoringservice.services.MeterService;
@@ -9,8 +10,11 @@ import org.monitoringservice.services.authexceptions.LoginException;
 import org.monitoringservice.services.authexceptions.RegistrationException;
 import org.monitoringservice.services.meterexecptions.MeterAddException;
 import org.monitoringservice.services.meterexecptions.ReadoutException;
+import org.monitoringservice.util.MigrationUtil;
+import org.monitoringservice.util.PropertiesUtil;
 
 import java.util.LinkedList;
+import java.util.Properties;
 import java.util.Scanner;
 
 /**
@@ -34,10 +38,13 @@ public class InputController {
      * Создание контроллера.
      */
     public InputController() {
-        UserRepository users = new UserRepository();
+        Properties properties = PropertiesUtil.getApplicationProperties();
+        UserRepository users = new UserRepository(properties);
+        MeterRepository history = new MeterRepository(properties);
         this.authService = new AuthenticationService(users);
-        this.meterService = new MeterService(users);
+        this.meterService = new MeterService(users, history);
         audit = new LinkedList<>();
+        MigrationUtil.migrateDB(properties);
     }
 
     /**
@@ -234,6 +241,7 @@ public class InputController {
         }
         try {
             meterService.addNewMeterToUser(user, scanner.nextLine());
+            System.out.println("Успешное добавление нового типа счетчика!");
             audit.add("Пользователь " + user.getLogin() + " добавил новый счетчик");
         } catch (MeterAddException e) {
             System.out.println(e.getMessage());

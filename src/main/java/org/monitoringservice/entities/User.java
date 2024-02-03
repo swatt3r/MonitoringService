@@ -2,14 +2,15 @@ package org.monitoringservice.entities;
 
 import lombok.Data;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-
 /**
  * Класс, описывающий пользователя.
  */
 @Data
 public class User {
+    /**
+     * Поле уникального идентификатора.
+     */
+    private int id;
     /**
      * Поле логина.
      */
@@ -38,14 +39,12 @@ public class User {
      * Поле номера квартиры.
      */
     private int apartmentNumber;
-    /**
-     * Поле со списком счетчиков.
-     */
-    private HashMap<MeterType, LinkedList<Reading>> history;
+
 
     /**
      * Создание пользователя с определенными параметрами.
      *
+     * @param id              уникальный идентификатор
      * @param login           логин
      * @param password        пароль
      * @param role            роль в сервисе
@@ -54,7 +53,8 @@ public class User {
      * @param houseNumber     номер дома
      * @param apartmentNumber номер квартиры
      */
-    public User(String login, String password, Role role, String city, String street, int houseNumber, int apartmentNumber) {
+    public User(int id, String login, String password, Role role, String city, String street, int houseNumber, int apartmentNumber) {
+        this.id = id;
         this.login = login;
         this.password = password;
         this.role = role;
@@ -62,6 +62,5 @@ public class User {
         this.street = street;
         this.houseNumber = houseNumber;
         this.apartmentNumber = apartmentNumber;
-        this.history = new HashMap<>();
     }
 }
