@@ -15,6 +15,9 @@ import java.util.LinkedList;
  * Класс сервиса, который работает со счетчиками и их показаниями.
  */
 public class MeterService {
+    /**
+     * Поле с репозиторием истории показаний и счетчиков.
+     */
     private final MeterRepository meterRepository;
     /**
      * Поле с репозиторием пользователей.
@@ -25,7 +28,8 @@ public class MeterService {
     /**
      * Создание сервиса с определенным репозиторием пользователей.
      *
-     * @param userRepo - репозиторий пользователей
+     * @param userRepo    - репозиторий пользователей
+     * @param historyRepo - репозиторий истории показаний и счетчиков
      */
     public MeterService(UserRepository userRepo, MeterRepository historyRepo) {
         this.meterRepository = historyRepo;
@@ -193,33 +197,32 @@ public class MeterService {
             throw new ReadoutException("Такой тип счетчика не зарегистрирован!");
         }
 
-        if(value < 0){
+        if (value < 0) {
             throw new ReadoutException("Неверное показание счетчика!");
         }
 
         LinkedList<Reading> userActual = meterRepository.findUserActualHistory(user.getId());
         Reading last = null;
-        for(Reading reading: userActual){
-            if(reading.getType().equals(type)){
+        for (Reading reading : userActual) {
+            if (reading.getType().equals(type)) {
                 last = reading;
                 break;
             }
         }
-        if(last!= null){
-            if(last.getReadOut() > value){
+        if (last != null) {
+            if (last.getReadOut() > value) {
                 throw new ReadoutException("Неверное показание счетчика!");
             }
 
             int[] currentDate = getCurrentDate();
             Calendar calendar = Calendar.getInstance();
             calendar.setTime(last.getDate());
-            if(currentDate[1] > calendar.get(Calendar.MONTH) || currentDate[2] > calendar.get(Calendar.YEAR)){
+            if (currentDate[1] > calendar.get(Calendar.MONTH) || currentDate[2] > calendar.get(Calendar.YEAR)) {
                 meterRepository.addNewReadout(user.getId(), type, new Date(), value);
-            }else {
-                throw  new ReadoutException("Запись в этом месяце уже есть!");
+            } else {
+                throw new ReadoutException("Запись в этом месяце уже есть!");
             }
-        }
-        else {
+        } else {
             meterRepository.addNewReadout(user.getId(), type, new Date(), value);
         }
     }

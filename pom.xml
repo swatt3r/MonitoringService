@@ -19,6 +19,8 @@
         <assertJ.version>3.24.2</assertJ.version>
         <postgresql.version>42.6.0</postgresql.version>
         <liquibase.version>4.25.1</liquibase.version>
+        <testcontainers.version>1.19.1</testcontainers.version>
+        <testcontainers.junit-jupiter.version>1.19.1</testcontainers.junit-jupiter.version>
     </properties>
 
     <dependencies>
@@ -61,6 +63,18 @@
             <groupId>org.liquibase</groupId>
             <artifactId>liquibase-core</artifactId>
             <version>${liquibase.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>${testcontainers.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>${testcontainers.junit-jupiter.version}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>

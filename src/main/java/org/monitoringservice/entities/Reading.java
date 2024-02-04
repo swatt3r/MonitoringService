@@ -29,7 +29,9 @@ public class Reading {
     /**
      * Создание показания с определенными параметрами.
      *
-     *
+     * @param id идентификатор пользователя
+     * @param type тип счетчика
+     * @param date дата
      * @param readOut показание
      */
     public Reading(int id, String type,Date date, int readOut) {

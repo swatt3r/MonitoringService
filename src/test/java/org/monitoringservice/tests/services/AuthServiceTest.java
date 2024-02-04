@@ -1,4 +1,4 @@
-package org.monitoringservice.tests;
+package org.monitoringservice.tests.services;
 
 
 import org.assertj.core.api.Assertions;

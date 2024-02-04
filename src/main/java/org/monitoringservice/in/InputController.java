@@ -286,6 +286,7 @@ public class InputController {
         System.out.print("Введите показание счетчика:");
         try {
             meterService.newReadout(user, type, Integer.parseInt(scanner.nextLine()));
+            System.out.println("Показание успешно внесено!");
             audit.add("Пользователь " + user.getLogin() + " внес новое показание");
         } catch (ReadoutException | NumberFormatException e) {
             System.out.println(e.getMessage());

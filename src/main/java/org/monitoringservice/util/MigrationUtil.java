@@ -17,18 +17,22 @@ import java.util.Properties;
  */
 public class MigrationUtil {
 
-    public static void migrateDB(Properties properties){
+    /**
+     * Метод производящий миграции БД.
+     *
+     * @param properties параметры приложения, в которых должна быть информация о подключении к БД и дериктории, где находится changeLogFile
+     */
+    public static void migrateDB(Properties properties) {
         try (Connection connection = DriverManager.getConnection(
                 properties.getProperty("url"),
                 properties.getProperty("username"),
-                properties.getProperty("password")))
-        {
+                properties.getProperty("password"))) {
             Database database =
                     DatabaseFactory.getInstance().findCorrectDatabaseImplementation(new JdbcConnection(connection));
             Liquibase liquibase =
                     new Liquibase(properties.getProperty("changeLogFile"), new ClassLoaderResourceAccessor(), database);
             liquibase.update();
-        }catch (SQLException | LiquibaseException e){
+        } catch (SQLException | LiquibaseException e) {
             System.out.println(e.getMessage());
         }
     }
