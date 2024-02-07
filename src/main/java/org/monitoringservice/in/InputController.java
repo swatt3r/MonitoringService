@@ -1,16 +1,23 @@
 package org.monitoringservice.in;
 
 import org.monitoringservice.entities.Role;
+import org.monitoringservice.entities.TypeOfAction;
 import org.monitoringservice.entities.User;
+import org.monitoringservice.repositories.MeterRepository;
 import org.monitoringservice.repositories.UserRepository;
+import org.monitoringservice.services.AuditService;
 import org.monitoringservice.services.AuthenticationService;
 import org.monitoringservice.services.MeterService;
 import org.monitoringservice.services.authexceptions.LoginException;
 import org.monitoringservice.services.authexceptions.RegistrationException;
 import org.monitoringservice.services.meterexecptions.MeterAddException;
 import org.monitoringservice.services.meterexecptions.ReadoutException;
+import org.monitoringservice.util.MigrationUtil;
+import org.monitoringservice.util.PropertiesUtil;
 
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Properties;
 import java.util.Scanner;
 
 /**
@@ -25,19 +32,23 @@ public class InputController {
      * Поле с сервисом для работы со счетчиками и показаниями.
      */
     private final MeterService meterService;
-    /**
-     * Поле для хранения действий пользователей.
-     */
-    private final LinkedList<String> audit;
+
+    private final AuditService audit;
 
     /**
      * Создание контроллера.
      */
     public InputController() {
         UserRepository users = new UserRepository();
-        this.authService = new AuthenticationService(users);
-        this.meterService = new MeterService(users);
-        audit = new LinkedList<>();
+        MeterRepository history = new MeterRepository();
+
+        authService = new AuthenticationService(users);
+        meterService = new MeterService(users, history);
+
+        audit = new AuditService();
+
+        Properties properties = PropertiesUtil.getApplicationProperties();
+        MigrationUtil.migrateDB(properties);
     }
 
     /**
@@ -132,7 +143,7 @@ public class InputController {
                     userMonth(user, scanner);
                     break;
                 case "/logout":
-                    audit.add("Пользователь " + user.getLogin() + " вышел из аккаунта");
+                    audit.saveAction(user.getLogin(), TypeOfAction.LogOut);
                     return;
                 default:
                     System.out.print("Такой операции не существует!");
@@ -161,7 +172,7 @@ public class InputController {
                     newType(scanner);
                     break;
                 case "/logout":
-                    audit.add("Администратор вышел из аккаунта");
+                    audit.saveAction("admin", TypeOfAction.LogOut);
                     return;
                 default:
                     System.out.print("Такой операции не существует!");
@@ -182,7 +193,7 @@ public class InputController {
             return;
         }
         meterService.addNewType(type);
-        audit.add("Администротор добавил новый тип счетчиков");
+        audit.saveAction("admin", TypeOfAction.NewMeter);
     }
 
     /**
@@ -191,7 +202,7 @@ public class InputController {
      * @param user - пользователь
      */
     private void userActual(User user) {
-        audit.add("Пользователь " + user.getLogin() + " получил актуальные показания");
+        audit.saveAction(user.getLogin(), TypeOfAction.Actual);
         LinkedList<String> result = meterService.getUserActual(user);
         if (!result.isEmpty()) {
             for (String line : result) {
@@ -208,7 +219,7 @@ public class InputController {
      * @param scanner - сканер, используется для считывания ввода с консоли
      */
     private void adminActual(Scanner scanner) {
-        audit.add("Администратор получил актуальные показания");
+        audit.saveAction("admin", TypeOfAction.Actual);
         System.out.print("Введите логин пользователя, или оставте пустым, для вывода акутуальных значений всех пользователей: ");
         String login = scanner.nextLine();
         LinkedList<String> actual = meterService.getActualForAdmin(login);
@@ -234,7 +245,8 @@ public class InputController {
         }
         try {
             meterService.addNewMeterToUser(user, scanner.nextLine());
-            audit.add("Пользователь " + user.getLogin() + " добавил новый счетчик");
+            System.out.println("Успешное добавление нового типа счетчика!");
+            audit.saveAction(user.getLogin(), TypeOfAction.AddMeter);
         } catch (MeterAddException e) {
             System.out.println(e.getMessage());
         }
@@ -246,8 +258,8 @@ public class InputController {
      * @param user - пользователь
      */
     private void showMeter(User user) {
-        audit.add("Пользователь " + user.getLogin() + " посмотрел свой список счетчиков");
-        LinkedList<String> meters = meterService.getUserMeters(user);
+        audit.saveAction(user.getLogin(), TypeOfAction.ShowUserMeter);
+        List<String> meters = meterService.getUserMeters(user);
         if (!meters.isEmpty()) {
             System.out.println("На вас зарегистрированы следующие счетчики:");
             for (String type : meters) {
@@ -265,8 +277,9 @@ public class InputController {
      * @param scanner - сканер, используется для считывания ввода с консоли
      */
     private void newReadout(User user, Scanner scanner) {
+
         System.out.println("Введите один из типов счетчика:");
-        LinkedList<String> meters = meterService.getUserMeters(user);
+        List<String> meters = meterService.getUserMeters(user);
         if (meters.isEmpty()) {
             System.out.println("Отсутствуют счетчики!");
             return;
@@ -278,9 +291,12 @@ public class InputController {
         System.out.print("Введите показание счетчика:");
         try {
             meterService.newReadout(user, type, Integer.parseInt(scanner.nextLine()));
-            audit.add("Пользователь " + user.getLogin() + " внес новое показание");
-        } catch (ReadoutException | NumberFormatException e) {
+            System.out.println("Показание успешно внесено!");
+            audit.saveAction(user.getLogin(), TypeOfAction.Readout);
+        } catch (ReadoutException e) {
             System.out.println(e.getMessage());
+        }catch (NumberFormatException e){
+            System.out.println("Неправильный ввод показания!");
         }
     }
 
@@ -290,8 +306,8 @@ public class InputController {
      * @param user - пользователь
      */
     private void userHistory(User user) {
-        audit.add("Пользователь " + user.getLogin() + " получил историю показаний");
-        LinkedList<String> history = meterService.getUserHistory(user);
+        audit.saveAction(user.getLogin(), TypeOfAction.History);
+        List<String> history = meterService.getUserHistory(user);
         if (!history.isEmpty()) {
             for (String line : history) {
                 System.out.println(line);
@@ -307,7 +323,7 @@ public class InputController {
      * @param scanner - сканер, используется для считывания ввода с консоли
      */
     private void adminHistory(Scanner scanner) {
-        audit.add("Администратор получил историю показаний");
+        audit.saveAction("admin", TypeOfAction.Actual);
         System.out.print("Введите логин пользователя, или оставте пустым, для вывода истории всех пользователей: ");
         String login = scanner.nextLine();
         LinkedList<String> history = meterService.getHistoryForAdmin(login);
@@ -336,7 +352,7 @@ public class InputController {
             return;
         }
         if (month > 0 && month < 13) {
-            audit.add("Пользователь " + user.getLogin() + " получил историю показаний за месяц");
+            audit.saveAction(user.getLogin(), TypeOfAction.MonthHistory);
             LinkedList<String> monthHistory = meterService.getUserMonthHistory(user, month);
             if (!monthHistory.isEmpty()) {
                 for (String line : monthHistory) {
@@ -356,7 +372,6 @@ public class InputController {
      * @param scanner - сканер, используется для считывания ввода с консоли
      */
     private void adminMonth(Scanner scanner) {
-        audit.add("Администратор получил историю показаний за месяц");
         System.out.print("Введите логин пользователя, или оставте пустым, для вывода месячной истории всех пользователей: ");
         String login = scanner.nextLine();
         System.out.print("Введите номер месяца: ");
@@ -369,6 +384,7 @@ public class InputController {
         }
         LinkedList<String> history = meterService.getMonthHistoryForAdmin(login, month);
         if (!history.isEmpty()) {
+            audit.saveAction("admin", TypeOfAction.MonthHistory);
             for (String line : history) {
                 System.out.println(line);
             }
@@ -404,7 +420,7 @@ public class InputController {
                 continue;
             }
             System.out.println("Успешная авторизация.");
-            audit.add("Пользователь " + login + " авторизовался");
+            audit.saveAction(user.getLogin(), TypeOfAction.Login);
             if (user.getRole() == Role.USER) {
                 userMenu(user, scanner);
             } else {
@@ -493,7 +509,8 @@ public class InputController {
             }
 
             System.out.println("Успешная Регистрация.");
-            audit.add("Пользователь " + login + " зарегистрировался");
+
+            audit.saveAction(login, TypeOfAction.Register);
             break;
         }
     }

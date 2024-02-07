@@ -1,0 +1,12 @@
+services:
+  postgres:
+    container_name: "monitoringDB"
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: "monitorService"
+      POSTGRES_USER: "user"
+      POSTGRES_PASSWORD: "secret"
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./src/main/resources/volume:/var/lib/postgresql/data

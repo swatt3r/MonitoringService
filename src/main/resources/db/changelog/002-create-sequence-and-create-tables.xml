@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="002-create-sequence-and-create-tables" author="swatter">
+        <createSequence
+                schemaName="monitoring"
+                sequenceName="monitor_sequence"
+                incrementBy="1"
+                maxValue="10000"
+                startValue="1"
+        />
+        <createTable tableName="users" schemaName="monitoring">
+            <column name="id" type="BIGINT"
+                    defaultValueComputed="nextval('monitoring.monitor_sequence')">
+                <constraints primaryKey="true" nullable="false" />
+            </column>
+            <column name="login" type="VARCHAR(255)">
+                <constraints unique="true" nullable="false" />
+            </column>
+            <column name="password" type="VARCHAR(255)">
+                <constraints nullable="false" />
+            </column>
+            <column name="role" type="VARCHAR(255)">
+                <constraints nullable="false" />
+            </column>
+            <column name="city" type="VARCHAR(255)">
+                <constraints nullable="false" />
+            </column>
+            <column name="street" type="VARCHAR(255)">
+                <constraints nullable="false" />
+            </column>
+            <column name="apartment" type="INTEGER">
+                <constraints nullable="false" />
+            </column>
+            <column name="house" type="INTEGER">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+        <createTable tableName="meter_history" schemaName="monitoring">
+            <column name="user_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="type" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date" type="DATE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="value" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createTable tableName="meter_types" schemaName="monitoring">
+            <column name="type" type="VARCHAR(255)">
+                <constraints primaryKey="true" nullable="false"  unique="true"/>
+            </column>
+        </createTable>
+        <createTable tableName="roles" schemaName="monitoring">
+            <column name="role" type="VARCHAR(255)">
+                <constraints primaryKey="true" nullable="false"  unique="true"/>
+            </column>
+        </createTable>
+        <createTable tableName="users_meters" schemaName="monitoring">
+            <column name="user_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="type" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+</databaseChangeLog>
