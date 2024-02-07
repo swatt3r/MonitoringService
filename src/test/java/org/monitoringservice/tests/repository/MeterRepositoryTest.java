@@ -5,15 +5,15 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.monitoringservice.entities.Reading;
+import org.monitoringservice.entities.MeterReading;
 import org.monitoringservice.repositories.MeterRepository;
 import org.monitoringservice.util.MigrationUtil;
 import org.monitoringservice.util.PropertiesUtil;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-import java.util.Date;
-import java.util.LinkedList;
+import java.time.LocalDate;
+import java.util.List;
 import java.util.Properties;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -48,7 +48,7 @@ public class MeterRepositoryTest {
         bdContainer.start();
         MigrationUtil.migrateDB(properties);
 
-        meterRepository = new MeterRepository(properties);
+        meterRepository = new MeterRepository();
     }
 
     /**
@@ -62,30 +62,30 @@ public class MeterRepositoryTest {
     @Test
     @DisplayName("Тест получения истории показаний пользователя")
     void findUserHistoryTest() {
-        LinkedList<Reading> userHistory = meterRepository.findHistoryByUserId(2);
+        List<MeterReading> userHistory = meterRepository.findHistoryByUserId(2);
         assertThat(userHistory.size()).isGreaterThanOrEqualTo(1);
     }
 
     @Test
     @DisplayName("Тест получения актуальных счетчиков пользователя")
     void saveAndFindUserTest() {
-        LinkedList<String> meters = meterRepository.findMetersByUserId(2);
+        List<String> meters = meterRepository.findMetersByUserId(2);
         assertThat(meters.size()).isGreaterThanOrEqualTo(1);
     }
 
     @Test
     @DisplayName("Тест получения всех типов счетчиков")
     void findAllMeterTypesTest() {
-        LinkedList<String> types = meterRepository.findAllMetersTypes();
+        List<String> types = meterRepository.findAllMetersTypes();
         assertThat(types.size()).isGreaterThanOrEqualTo(3);
     }
 
     @Test
     @DisplayName("Тест получения истории показаний пользователя за месяц")
     void findUserMonthHistoryTest() {
-        LinkedList<Reading> history = meterRepository.findMonthHistoryByUserId(2, 12);
+        List<MeterReading> history = meterRepository.findMonthHistoryByUserId(2, 12);
         assertThat(history.size()).isGreaterThanOrEqualTo(1);
-        Reading read = new Reading(2, "Heat", new Date(1702929600000L), 56);
+        MeterReading read = new MeterReading(2, "Heat", LocalDate.of(2023,12,19), 56);
         assertThat(history.contains(read))
                 .isEqualTo(true);
     }
@@ -94,7 +94,7 @@ public class MeterRepositoryTest {
     @DisplayName("Тест добавления нового типа счетчика")
     void addNewMeterTypeTest() {
         meterRepository.addNewType("TestType");
-        LinkedList<String> typesAfter = meterRepository.findAllMetersTypes();
+        List<String> typesAfter = meterRepository.findAllMetersTypes();
         assertThat(typesAfter.contains("TestType")).isEqualTo(true);
     }
 
@@ -103,14 +103,14 @@ public class MeterRepositoryTest {
     void addNewTypeToUserTest() {
         meterRepository.addNewType("TestType");
         meterRepository.addNewTypeToUser(2,"TestType");
-        LinkedList<String> typesAfter = meterRepository.findMetersByUserId(2);
+        List<String> typesAfter = meterRepository.findMetersByUserId(2);
         assertThat(typesAfter.contains("TestType")).isEqualTo(true);
     }
 
     @Test
     @DisplayName("Тест получения актуальной истории показаний пользователя")
     void findUserActualHistory() {
-        LinkedList<Reading> history = meterRepository.findUserActualHistory(2);
+        List<MeterReading> history = meterRepository.findUserActualHistory(2);
         assertThat(history.size()).isGreaterThanOrEqualTo(1);
     }
 }

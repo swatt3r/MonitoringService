@@ -13,7 +13,7 @@ import org.monitoringservice.util.PropertiesUtil;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-import java.util.LinkedList;
+import java.util.List;
 import java.util.Properties;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -48,7 +48,7 @@ public class UserRepositoryTest {
         bdContainer.start();
         MigrationUtil.migrateDB(properties);
 
-        userRepository = new UserRepository(properties);
+        userRepository = new UserRepository();
     }
 
     /**
@@ -100,7 +100,7 @@ public class UserRepositoryTest {
     @Test
     @DisplayName("Тест получения всех пользователей")
     void FindAllUsersTest() {
-        LinkedList<User> users = userRepository.findAllUsers();
+        List<User> users = userRepository.findAllUsers();
         assertThat(users.size()).isGreaterThanOrEqualTo(1);
     }
 }

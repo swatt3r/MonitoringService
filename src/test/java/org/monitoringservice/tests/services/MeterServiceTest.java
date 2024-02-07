@@ -9,7 +9,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.monitoringservice.entities.Reading;
+import org.monitoringservice.entities.MeterReading;
 import org.monitoringservice.entities.Role;
 import org.monitoringservice.entities.User;
 import org.monitoringservice.repositories.MeterRepository;
@@ -18,8 +18,9 @@ import org.monitoringservice.services.MeterService;
 import org.monitoringservice.services.meterexecptions.MeterAddException;
 import org.monitoringservice.services.meterexecptions.ReadoutException;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.LinkedList;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -53,7 +54,7 @@ class MeterServiceTest {
     /**
      * LinkedList истории показаний для теста.
      */
-    private LinkedList<Reading> history;
+    private LinkedList<MeterReading> history;
     /**
      * LinkedList всех типов счетчиков для теста.
      */
@@ -136,7 +137,7 @@ class MeterServiceTest {
         Mockito.when(meterRepository.findMetersByUserId(2))
                 .thenReturn(userTypes);
 
-        LinkedList<String> meters = meterService.getUserMeters(users.get(1));
+        List<String> meters = meterService.getUserMeters(users.get(1));
         assertThat(meters.size()).isEqualTo(1);
     }
 
@@ -146,7 +147,7 @@ class MeterServiceTest {
         Mockito.when(meterRepository.findHistoryByUserId(2))
                 .thenReturn(history);
 
-        LinkedList<String> history = meterService.getUserHistory(users.get(1));
+        List<String> history = meterService.getUserHistory(users.get(1));
         assertThat(history.size()).isEqualTo(1);
     }
 
@@ -209,8 +210,8 @@ class MeterServiceTest {
     @Test
     @DisplayName("Тест внесения нового показания. Неверный месяц.")
     void newReadoutTest_invalidMonth() {
-        LinkedList<Reading> userHistory = new LinkedList<>();
-        userHistory.add(new Reading(2, "Heat", new Date(1707065711000L), 56));
+        LinkedList<MeterReading> userHistory = new LinkedList<>();
+        userHistory.add(new MeterReading(2, "Heat", LocalDate.of(2024,2,7), 56));
 
         LinkedList<String> userTypes = new LinkedList<>();
         userTypes.add("Heat");
@@ -263,7 +264,7 @@ class MeterServiceTest {
         users.add(user1);
         users.add(user2);
 
-        history.add(new Reading(2, "Heat", new Date(1702929600000L), 56));
+        history.add(new MeterReading(2, "Heat", LocalDate.of(2023,12,19), 56));
 
         types.add("Heat");
         types.add("HotWater");

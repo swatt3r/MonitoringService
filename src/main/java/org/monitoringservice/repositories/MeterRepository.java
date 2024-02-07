@@ -1,53 +1,30 @@
 package org.monitoringservice.repositories;
 
-import org.monitoringservice.entities.Reading;
+import org.monitoringservice.entities.MeterReading;
 
 import java.sql.*;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.LinkedList;
-import java.util.Properties;
+import java.util.List;
 
 /**
  * Класс репозитория истории показаний и счетчиков.
  */
-public class MeterRepository {
-    /**
-     * Поле URL для подключения с БД.
-     */
-    private final String URL;
-    /**
-     * Поле USERNAME для подключения с БД.
-     */
-    private final String USERNAME;
-    /**
-     * Поле PASSWORD для подключения с БД.
-     */
-    private final String PASSWORD;
-
-    /**
-     * Задание параметров, нужных для подключения к базе данных.
-     */
-    public MeterRepository(Properties properties) {
-        URL = properties.getProperty("url");
-        USERNAME = properties.getProperty("username");
-        PASSWORD = properties.getProperty("password");
-    }
-
+public class MeterRepository implements Repository {
     /**
      * Метод получения истории показаний конкретного пользователя из БД.
      *
      * @param userId идентификатор пользователя
      * @return LinkedList - Список в котором содержится вся история показаний пользователя с даныым id.
      */
-    public LinkedList<Reading> findHistoryByUserId(int userId) {
-        LinkedList<Reading> result = new LinkedList<>();
-        try (Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD)) {
+    public List<MeterReading> findHistoryByUserId(int userId) {
+        List<MeterReading> result = new LinkedList<>();
+        String sql = "SELECT * FROM monitoring.meter_history WHERE user_id = ?";
 
-            String sql = "SELECT * FROM monitoring.meter_history WHERE user_id = ?";
+        try (Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
+             PreparedStatement statement = connection.prepareStatement(sql)) {
 
-            PreparedStatement statement = connection.prepareStatement(sql);
             statement.setInt(1, userId);
-
             ResultSet resultSet = statement.executeQuery();
             result = getReadingsFromResultSet(resultSet);
 
@@ -63,13 +40,13 @@ public class MeterRepository {
      * @param userId идентификатор пользователя
      * @return LinkedList - Список в котором содержатся все счетчики, которые есть у пользователя с даныым id.
      */
-    public LinkedList<String> findMetersByUserId(int userId) {
-        LinkedList<String> result = new LinkedList<>();
-        try (Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD)) {
+    public List<String> findMetersByUserId(int userId) {
+        List<String> result = new LinkedList<>();
+        String sql = "SELECT type FROM monitoring.users_meters WHERE user_id = ?";
 
-            String sql = "SELECT type FROM monitoring.users_meters WHERE user_id = ?";
+        try (Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
+             PreparedStatement statement = connection.prepareStatement(sql)) {
 
-            PreparedStatement statement = connection.prepareStatement(sql);
             statement.setInt(1, userId);
 
             ResultSet resultSet = statement.executeQuery();
@@ -89,12 +66,12 @@ public class MeterRepository {
      * @param month  месяц
      * @return LinkedList - Список в котором содержится вся история показаний за месяц пользователя с даныым id.
      */
-    public LinkedList<Reading> findMonthHistoryByUserId(int userId, int month) {
-        LinkedList<Reading> result = new LinkedList<>();
-        try (Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD)) {
+    public List<MeterReading> findMonthHistoryByUserId(int userId, int month) {
+        List<MeterReading> result = new LinkedList<>();
+        String sql = "SELECT * FROM monitoring.meter_history WHERE user_id = ? AND to_char(date , 'MM') = ?;";
 
-            String sql = "SELECT * FROM monitoring.meter_history WHERE user_id = ? AND to_char(date , 'MM') = ?;";
-            PreparedStatement statement = connection.prepareStatement(sql);
+        try (Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
+             PreparedStatement statement = connection.prepareStatement(sql)) {
 
             statement.setInt(1, userId);
             if (month < 10) {
@@ -102,7 +79,6 @@ public class MeterRepository {
             } else {
                 statement.setString(2, String.valueOf(month));
             }
-
 
             ResultSet resultSet = statement.executeQuery();
             result = getReadingsFromResultSet(resultSet);
@@ -117,13 +93,12 @@ public class MeterRepository {
      *
      * @return LinkedList - Список в котором содержатся все доступные типы счетчиков.
      */
-    public LinkedList<String> findAllMetersTypes() {
-        LinkedList<String> result = new LinkedList<>();
-        try (Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD)) {
+    public List<String> findAllMetersTypes() {
+        List<String> result = new LinkedList<>();
+        String sql = "SELECT * FROM monitoring.meter_types";
 
-            String sql = "SELECT * FROM monitoring.meter_types";
-
-            Statement statement = connection.createStatement();
+        try (Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
+             Statement statement = connection.createStatement()) {
 
             ResultSet resultSet = statement.executeQuery(sql);
             while (resultSet.next()) {
@@ -141,9 +116,10 @@ public class MeterRepository {
      * @param newType название нового типа счетчика
      */
     public void addNewType(String newType) {
-        try (Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD)) {
-            String sql = "INSERT INTO monitoring.meter_types VALUES (?)";
-            PreparedStatement statement = connection.prepareStatement(sql);
+        String sql = "INSERT INTO monitoring.meter_types VALUES (?)";
+
+        try (Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
+             PreparedStatement statement = connection.prepareStatement(sql)) {
 
             statement.setString(1, newType);
             statement.executeQuery();
@@ -158,9 +134,10 @@ public class MeterRepository {
      * @param newType название нового типа счетчика
      */
     public void addNewTypeToUser(int userId, String newType) {
-        try (Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD)) {
-            String sql = "INSERT INTO monitoring.users_meters VALUES (?,?)";
-            PreparedStatement statement = connection.prepareStatement(sql);
+        String sql = "INSERT INTO monitoring.users_meters VALUES (?,?)";
+
+        try (Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
+             PreparedStatement statement = connection.prepareStatement(sql)) {
 
             statement.setInt(1, userId);
             statement.setString(2, newType);
@@ -175,12 +152,14 @@ public class MeterRepository {
      * @param userId идентификатор пользователя
      * @return LinkedList - Список в котором содержатся актуальные показания пользователя с даныым id.
      */
-    public LinkedList<Reading> findUserActualHistory(int userId) {
-        LinkedList<Reading> result = new LinkedList<>();
-        try (Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD)) {
-            LinkedList<String> userTypes = findMetersByUserId(userId);
-            String sql = "SELECT * FROM monitoring.meter_history WHERE user_id = ? AND type = ? AND date = (SELECT MAX(date) FROM monitoring.meter_history WHERE type = ?)";
-            PreparedStatement statement = connection.prepareStatement(sql);
+    public List<MeterReading> findUserActualHistory(int userId) {
+        List<MeterReading> result = new LinkedList<>();
+        String sql = "SELECT * FROM monitoring.meter_history WHERE user_id = ? AND type = ? AND date = (SELECT MAX(date) FROM monitoring.meter_history WHERE type = ?)";
+
+        try (Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            List<String> userTypes = findMetersByUserId(userId);
 
             for (String type : userTypes) {
                 statement.setInt(1, userId);
@@ -204,14 +183,15 @@ public class MeterRepository {
      * @param date   дата подачи показания
      * @param value  значение счетчика
      */
-    public void addNewReadout(int userId, String type, Date date, int value) {
-        try (Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD)) {
-            String sql = "INSERT INTO monitoring.meter_history VALUES (?,?,?,?)";
-            PreparedStatement statement = connection.prepareStatement(sql);
+    public void addNewReadout(int userId, String type, LocalDate date, int value) {
+        String sql = "INSERT INTO monitoring.meter_history VALUES (?,?,?,?)";
+
+        try (Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
+             PreparedStatement statement = connection.prepareStatement(sql)) {
 
             statement.setInt(1, userId);
             statement.setString(2, type);
-            statement.setDate(3, new java.sql.Date(date.getTime()));
+            statement.setDate(3, java.sql.Date.valueOf(date));
             statement.setInt(4, value);
             statement.executeQuery();
         } catch (SQLException ignored) {
@@ -224,14 +204,14 @@ public class MeterRepository {
      * @param resultSet ResultSet из БД
      * @return LinkedList - Список в котором содержатся показания, находящиеся в ResultSet.
      */
-    private LinkedList<Reading> getReadingsFromResultSet(ResultSet resultSet) {
-        LinkedList<Reading> result = new LinkedList<>();
+    private List<MeterReading> getReadingsFromResultSet(ResultSet resultSet) {
+        List<MeterReading> result = new LinkedList<>();
         try {
             while (resultSet.next()) {
-                result.add(new Reading(
+                result.add(new MeterReading(
                         resultSet.getInt("user_id"),
                         resultSet.getString("type"),
-                        resultSet.getDate("date"),
+                        resultSet.getDate("date").toLocalDate(),
                         resultSet.getInt("value")
                 ));
             }

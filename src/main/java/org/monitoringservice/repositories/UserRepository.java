@@ -5,34 +5,12 @@ import org.monitoringservice.entities.User;
 
 import java.sql.*;
 import java.util.LinkedList;
-import java.util.Properties;
+import java.util.List;
 
 /**
  * Класс репозитория пользователей.
  */
-public class UserRepository {
-    /**
-     * Поле URL для подключения с БД.
-     */
-    private final String URL;
-    /**
-     * Поле USERNAME для подключения с БД.
-     */
-    private final String USERNAME;
-    /**
-     * Поле PASSWORD для подключения с БД.
-     */
-    private final String PASSWORD;
-
-    /**
-     * Задание параметров, нужных для подключения к базе данных
-     */
-    public UserRepository(Properties properties) {
-        URL = properties.getProperty("url");
-        USERNAME = properties.getProperty("username");
-        PASSWORD = properties.getProperty("password");
-    }
-
+public class UserRepository implements Repository {
     /**
      * Метод получения пользователя по логину.
      *
@@ -41,9 +19,11 @@ public class UserRepository {
      */
     public User findUserByLogin(String login) {
         User result = null;
-        try (Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD)) {
-            String sqlFindByLogin = "SELECT * FROM monitoring.users WHERE login = ?";
-            PreparedStatement statement = connection.prepareStatement(sqlFindByLogin);
+        String sql = "SELECT * FROM monitoring.users WHERE login = ?";
+
+        try (Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
             statement.setString(1, login);
 
             ResultSet resultSet = statement.executeQuery();
@@ -60,13 +40,12 @@ public class UserRepository {
      *
      * @return LinkedList - список всех пользователей
      */
-    public LinkedList<User> findAllUsers() {
-        LinkedList<User> result = new LinkedList<>();
-        try (Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD)) {
+    public List<User> findAllUsers() {
+        List<User> result = new LinkedList<>();
+        String sql = "SELECT * FROM monitoring.users WHERE role NOT IN ('ADMIN')";
 
-            String sql = "SELECT * FROM monitoring.users WHERE role NOT IN ('ADMIN')";
-
-            Statement statement = connection.createStatement();
+        try (Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
+             Statement statement = connection.createStatement()) {
 
             ResultSet resultSet = statement.executeQuery(sql);
             while (resultSet.next()) {
@@ -89,9 +68,11 @@ public class UserRepository {
      */
     public User findUserByFullAddress(String city, String street, int houseNumber, int apartmentNumber) {
         User result = null;
-        try (Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD)) {
-            String sqlFindByLogin = "SELECT * FROM monitoring.users WHERE city = ? AND street = ? AND apartment = ? AND house = ?";
-            PreparedStatement statement = connection.prepareStatement(sqlFindByLogin);
+        String sql = "SELECT * FROM monitoring.users WHERE city = ? AND street = ? AND apartment = ? AND house = ?";
+
+        try (Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
             statement.setString(1, city);
             statement.setString(2, street);
             statement.setInt(3, apartmentNumber);
@@ -112,9 +93,10 @@ public class UserRepository {
      * @param user пользователь
      */
     public void save(User user) {
-        try (Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD)) {
-            String sql = "INSERT INTO monitoring.users VALUES (DEFAULT, ?,?,?,?,?,?,?)";
-            PreparedStatement statement = connection.prepareStatement(sql);
+        String sql = "INSERT INTO monitoring.users VALUES (DEFAULT, ?,?,?,?,?,?,?)";
+
+        try (Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
+             PreparedStatement statement = connection.prepareStatement(sql)) {
 
             statement.setString(1, user.getLogin());
             statement.setString(2, user.getPassword());

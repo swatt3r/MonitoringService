@@ -2,13 +2,13 @@ package org.monitoringservice.entities;
 
 import lombok.Data;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 /**
  * Класс, описывающий показание счетчика.
  */
 @Data
-public class Reading {
+public class MeterReading {
     /**
      * Поле уникального идентификатора пользователя.
      */
@@ -20,7 +20,7 @@ public class Reading {
     /**
      * Поле даты.
      */
-    private Date date;
+    private LocalDate date;
     /**
      * Поле показания.
      */
@@ -29,12 +29,12 @@ public class Reading {
     /**
      * Создание показания с определенными параметрами.
      *
-     * @param id идентификатор пользователя
-     * @param type тип счетчика
-     * @param date дата
+     * @param id      идентификатор пользователя
+     * @param type    тип счетчика
+     * @param date    дата
      * @param readOut показание
      */
-    public Reading(int id, String type,Date date, int readOut) {
+    public MeterReading(int id, String type, LocalDate date, int readOut) {
         this.userId = id;
         this.type = type;
         this.date = date;

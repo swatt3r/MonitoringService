@@ -4,7 +4,7 @@
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                    https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
-    <changeSet id="003-create-tables" author="swatter">
+    <changeSet id="002-create-sequence-and-create-tables" author="swatter">
         <createSequence
                 schemaName="monitoring"
                 sequenceName="monitor_sequence"

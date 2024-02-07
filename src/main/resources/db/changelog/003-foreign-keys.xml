@@ -4,7 +4,7 @@
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                    https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
-    <changeSet id="004-foreign-keys" author="swatter">
+    <changeSet id="003-foreign-keys" author="swatter">
         <addForeignKeyConstraint baseTableSchemaName="monitoring" baseTableName="meter_history" baseColumnNames="user_id"
                                  constraintName="fk_meter_user"
                                  referencedTableSchemaName="monitoring" referencedTableName="users" referencedColumnNames="id"

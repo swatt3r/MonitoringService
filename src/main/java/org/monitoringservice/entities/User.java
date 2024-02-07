@@ -10,7 +10,7 @@ public class User {
     /**
      * Поле уникального идентификатора.
      */
-    private int id;
+    private Integer id;
     /**
      * Поле логина.
      */
