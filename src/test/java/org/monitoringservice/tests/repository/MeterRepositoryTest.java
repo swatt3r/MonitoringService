@@ -1,10 +1,7 @@
 package org.monitoringservice.tests.repository;
 
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.monitoringservice.entities.MeterReading;
 import org.monitoringservice.repositories.MeterRepository;
 import org.monitoringservice.util.MigrationUtil;
@@ -38,13 +35,13 @@ public class MeterRepositoryTest {
     /**
      * Поле с репозиторием.
      */
-    private MeterRepository meterRepository;
+    private static MeterRepository meterRepository;
 
     /**
      * Метод иницализации БД контейнера и репозитория.
      */
-    @BeforeEach
-    void initRepository() {
+    @BeforeAll
+    static void initRepository() {
         bdContainer.start();
         MigrationUtil.migrateDB(properties);
 
@@ -54,8 +51,8 @@ public class MeterRepositoryTest {
     /**
      * Метод закрытия БД контейнера.
      */
-    @AfterEach
-    void closeContainer() {
+    @AfterAll
+    static void closeContainer() {
         bdContainer.close();
     }
 
