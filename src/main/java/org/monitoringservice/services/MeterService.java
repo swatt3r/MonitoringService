@@ -41,23 +41,26 @@ public class MeterService {
      * Метод добавления нового типа счетчиков.
      *
      * @param typeName - название нового типа счетчиков
+     * @throws MeterAddException если такой тип счетчика уже зарегистрирован
      */
-    public void addNewType(String typeName) {
+    public void addNewType(String typeName) throws MeterAddException {
         List<String> types = meterRepository.findAllMetersTypes();
         if (!types.contains(typeName)) {
             meterRepository.addNewType(typeName);
+        } else {
+            throw new MeterAddException("Такой тип счетчика уже есть!");
         }
     }
 
     /**
      * Метод получения актуальных показаний счетчиков у пользователя.
      *
-     * @param user пользователь
+     * @param id идентификатор пользователя
      * @return LinkedList - список, который содержит строки с записями актуальных показаний
      */
-    public LinkedList<String> getUserActual(User user) {
+    public LinkedList<String> getUserActual(int id) {
         LinkedList<String> result = new LinkedList<>();
-        List<MeterReading> readings = meterRepository.findUserActualHistory(user.getId());
+        List<MeterReading> readings = meterRepository.findUserActualHistory(id);
         for (MeterReading read : readings) {
             result.add(read.getType() + ", " + read.getDate() + " - " + read.getReadOut());
         }
@@ -73,7 +76,7 @@ public class MeterService {
     public LinkedList<String> getActualForAdmin(String login) {
         LinkedList<String> adminActual = new LinkedList<>();
         for (User user : findByLogin(login)) {
-            for (String line : getUserActual(user)) {
+            for (String line : getUserActual(user.getId())) {
                 adminActual.add(user.getLogin() + ", " + line);
             }
         }
@@ -92,19 +95,19 @@ public class MeterService {
     /**
      * Метод добавления нового счетчика пользователю.
      *
-     * @param user    пользователь
+     * @param id      идентификатор пользователя
      * @param newType название типа счетчика, который нужно добавить
      * @throws MeterAddException если такого типа счетчика не существует или счетчик уже зарегистрирован на пользователя
      */
-    public void addNewMeterToUser(User user, String newType) throws MeterAddException {
+    public void addNewMeterToUser(int id, String newType) throws MeterAddException {
         List<String> types = meterRepository.findAllMetersTypes();
         if (!types.contains(newType)) {
             throw new MeterAddException("Такого типа счетчика нет в системе!");
         }
 
-        types = meterRepository.findMetersByUserId(user.getId());
+        types = meterRepository.findMetersByUserId(id);
         if (!types.contains(newType)) {
-            meterRepository.addNewTypeToUser(user.getId(), newType);
+            meterRepository.addNewTypeToUser(id, newType);
         } else {
             throw new MeterAddException("Такой счетчик уже есть!");
         }
@@ -113,22 +116,22 @@ public class MeterService {
     /**
      * Метод получения актуальных счетчиков пользователя.
      *
-     * @param user пользователь
+     * @param id идентификатор пользователя
      * @return LinkedList - список, который содержит строки с записями актуальных счетчиков
      */
-    public List<String> getUserMeters(User user) {
-        return meterRepository.findMetersByUserId(user.getId());
+    public List<String> getUserMeters(int id) {
+        return meterRepository.findMetersByUserId(id);
     }
 
     /**
      * Метод получения истории показаний пользователя.
      *
-     * @param user пользователь
+     * @param id идентификатор пользователя
      * @return LinkedList - список, который содержит строки с записями истории показаний
      */
-    public List<String> getUserHistory(User user) {
+    public List<String> getUserHistory(int id) {
         List<String> result = new LinkedList<>();
-        List<MeterReading> readings = meterRepository.findHistoryByUserId(user.getId());
+        List<MeterReading> readings = meterRepository.findHistoryByUserId(id);
         for (MeterReading read : readings) {
             result.add(read.getType() + ", " + read.getDate() + " - " + read.getReadOut());
         }
@@ -144,7 +147,7 @@ public class MeterService {
     public LinkedList<String> getHistoryForAdmin(String login) {
         LinkedList<String> adminHistory = new LinkedList<>();
         for (User user : findByLogin(login)) {
-            for (String line : getUserHistory(user)) {
+            for (String line : getUserHistory(user.getId())) {
                 adminHistory.add(user.getLogin() + ", " + line);
             }
         }
@@ -154,13 +157,13 @@ public class MeterService {
     /**
      * Метод получения истории показаний пользователя за конкретный месяц.
      *
-     * @param user  пользователь
+     * @param id    идентификатор пользователя
      * @param month месяц
      * @return LinkedList - список, который содержит строки с записями истории показаний, если показания с таким месяцем не найдены, вернет пустой список
      */
-    public LinkedList<String> getUserMonthHistory(User user, int month) {
+    public LinkedList<String> getUserMonthHistory(int id, int month) {
         LinkedList<String> result = new LinkedList<>();
-        List<MeterReading> readings = meterRepository.findMonthHistoryByUserId(user.getId(), month);
+        List<MeterReading> readings = meterRepository.findMonthHistoryByUserId(id, month);
         for (MeterReading read : readings) {
             result.add(read.getType() + ", " + read.getDate() + " - " + read.getReadOut());
         }
@@ -177,7 +180,7 @@ public class MeterService {
     public LinkedList<String> getMonthHistoryForAdmin(String login, int month) {
         LinkedList<String> adminMonth = new LinkedList<>();
         for (User user : findByLogin(login)) {
-            for (String line : getUserMonthHistory(user, month)) {
+            for (String line : getUserMonthHistory(user.getId(), month)) {
                 adminMonth.add(user.getLogin() + ", " + line);
             }
         }
@@ -187,13 +190,13 @@ public class MeterService {
     /**
      * Метод добавления нового показания от пользователя.
      *
-     * @param user  пользователь
+     * @param id    идентификатор пользователя
      * @param type  тип счетчика
      * @param value значение счетчика
      * @throws ReadoutException если такого типа счетчика не зарегистрировано на пользователя. Если новое показание счетчика неверно. Если запись в данном месяце уже есть
      */
-    public void newReadout(User user, String type, int value) throws ReadoutException {
-        List<String> types = meterRepository.findMetersByUserId(user.getId());
+    public void newReadout(int id, String type, int value) throws ReadoutException {
+        List<String> types = meterRepository.findMetersByUserId(id);
         if (!types.contains(type)) {
             throw new ReadoutException("Такой тип счетчика не зарегистрирован!");
         }
@@ -202,7 +205,7 @@ public class MeterService {
             throw new ReadoutException("Неверное показание счетчика!");
         }
 
-        List<MeterReading> userActual = meterRepository.findUserActualHistory(user.getId());
+        List<MeterReading> userActual = meterRepository.findUserActualHistory(id);
         MeterReading last = null;
         for (MeterReading reading : userActual) {
             if (reading.getType().equals(type)) {
@@ -218,12 +221,12 @@ public class MeterService {
             int[] currentDate = getCurrentDate();
             LocalDate now = LocalDate.now();
             if (currentDate[1] > now.getMonth().getValue() || currentDate[2] > now.getYear()) {
-                meterRepository.addNewReadout(user.getId(), type, LocalDate.now(), value);
+                meterRepository.addNewReadout(id, type, LocalDate.now(), value);
             } else {
                 throw new ReadoutException("Запись в этом месяце уже есть!");
             }
         } else {
-            meterRepository.addNewReadout(user.getId(), type, LocalDate.now(), value);
+            meterRepository.addNewReadout(id, type, LocalDate.now(), value);
         }
     }
 

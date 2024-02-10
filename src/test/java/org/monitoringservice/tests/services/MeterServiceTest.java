@@ -66,7 +66,7 @@ class MeterServiceTest {
     void userActualTest() {
         Mockito.when(meterRepository.findUserActualHistory(2))
                 .thenReturn(history);
-        LinkedList<String> user1Actual = meterService.getUserActual(users.get(1));
+        LinkedList<String> user1Actual = meterService.getUserActual(2);
         assertThat(user1Actual.size()).isGreaterThanOrEqualTo(1);
     }
 
@@ -89,7 +89,7 @@ class MeterServiceTest {
         Mockito.when(meterRepository.findAllMetersTypes())
                 .thenReturn(types);
         assertThatThrownBy(() ->
-                meterService.addNewMeterToUser(users.get(1), "Electricity"))
+                meterService.addNewMeterToUser(2, "Electricity"))
                 .isInstanceOf(MeterAddException.class)
                 .hasMessageContaining("Такого типа счетчика нет в системе!");
     }
@@ -106,7 +106,7 @@ class MeterServiceTest {
                 .thenReturn(userTypes);
 
         assertThatThrownBy(() ->
-                meterService.addNewMeterToUser(users.get(1), "Heat"))
+                meterService.addNewMeterToUser(2, "Heat"))
                 .isInstanceOf(MeterAddException.class)
                 .hasMessageContaining("Такой счетчик уже есть!");
     }
@@ -123,7 +123,7 @@ class MeterServiceTest {
                 .thenReturn(userTypes);
 
         try {
-            meterService.addNewMeterToUser(users.get(1), "ColdWater");
+            meterService.addNewMeterToUser(2, "ColdWater");
         } catch (MeterAddException e) {
             Assertions.fail("Счетчик не добавился!");
         }
@@ -137,7 +137,7 @@ class MeterServiceTest {
         Mockito.when(meterRepository.findMetersByUserId(2))
                 .thenReturn(userTypes);
 
-        List<String> meters = meterService.getUserMeters(users.get(1));
+        List<String> meters = meterService.getUserMeters(users.get(1).getId());
         assertThat(meters.size()).isEqualTo(1);
     }
 
@@ -147,7 +147,7 @@ class MeterServiceTest {
         Mockito.when(meterRepository.findHistoryByUserId(2))
                 .thenReturn(history);
 
-        List<String> history = meterService.getUserHistory(users.get(1));
+        List<String> history = meterService.getUserHistory(2);
         assertThat(history.size()).isEqualTo(1);
     }
 
@@ -170,10 +170,10 @@ class MeterServiceTest {
         Mockito.when(meterRepository.findMonthHistoryByUserId(2, 12))
                 .thenReturn(history);
 
-        LinkedList<String> history = meterService.getUserMonthHistory(users.get(1), 12);
+        LinkedList<String> history = meterService.getUserMonthHistory(2, 12);
         assertThat(history.size()).isEqualTo(1);
 
-        history = meterService.getUserMonthHistory(users.get(1), -1);
+        history = meterService.getUserMonthHistory(2, -1);
         assertThat(history.size()).isEqualTo(0);
     }
 
@@ -202,7 +202,7 @@ class MeterServiceTest {
                 .thenReturn(userTypes);
 
         assertThatThrownBy(() ->
-                meterService.newReadout(users.get(1), "Heat", -10))
+                meterService.newReadout(2, "Heat", -10))
                 .isInstanceOf(ReadoutException.class)
                 .hasMessageContaining("Неверное показание счетчика!");
     }
@@ -221,7 +221,7 @@ class MeterServiceTest {
         Mockito.when(meterRepository.findUserActualHistory(2))
                 .thenReturn(userHistory);
         assertThatThrownBy(() ->
-                meterService.newReadout(users.get(1), "Heat", 57))
+                meterService.newReadout(2, "Heat", 57))
                 .isInstanceOf(ReadoutException.class)
                 .hasMessageContaining("Запись в этом месяце уже есть!");
     }
@@ -230,7 +230,7 @@ class MeterServiceTest {
     @DisplayName("Тест внесения нового показания. Неверный тип счетчика.")
     void newReadoutTest_invalidMeter() {
         assertThatThrownBy(() ->
-                meterService.newReadout(users.get(1), "Electricity", 50))
+                meterService.newReadout(2, "Electricity", 50))
                 .isInstanceOf(ReadoutException.class)
                 .hasMessageContaining("Такой тип счетчика не зарегистрирован!");
     }
@@ -244,7 +244,7 @@ class MeterServiceTest {
                 .thenReturn(userTypes);
 
         try {
-            meterService.newReadout(users.get(1), "Heat", 57);
+            meterService.newReadout(2, "Heat", 57);
         } catch (ReadoutException e) {
             Assertions.fail("Показание неверно!");
         }
