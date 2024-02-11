@@ -1,12 +1,10 @@
 package org.monitoringservice.tests.servlet;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.monitoringservice.dto.UserDTO;
@@ -14,11 +12,9 @@ import org.monitoringservice.dto.UserLoginDTO;
 import org.monitoringservice.entities.Role;
 import org.monitoringservice.entities.User;
 import org.monitoringservice.in.servlets.LoginServlet;
-import org.monitoringservice.services.AuthenticationService;
 import org.monitoringservice.services.authexceptions.LoginException;
 import org.monitoringservice.util.mapper.UserMapper;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.BufferedReader;
@@ -29,19 +25,7 @@ import java.util.List;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class LoginServletTest {
-    @Mock
-    private AuthenticationService authService;
-
-    @Mock
-    private HttpServletRequest req;
-
-    @Mock
-    private HttpServletResponse resp;
-
-    @Mock
-    private static ObjectMapper objectMapper;
-
+public class LoginServletTest extends ServletTest{
     @InjectMocks
     private LoginServlet loginServlet;
 

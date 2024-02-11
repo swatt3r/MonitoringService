@@ -1,19 +1,15 @@
 package org.monitoringservice.tests.servlet;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.monitoringservice.dto.MeterTypeDTO;
 import org.monitoringservice.entities.Role;
 import org.monitoringservice.in.servlets.NewTypeServlet;
-import org.monitoringservice.services.MeterService;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.BufferedReader;
@@ -22,19 +18,7 @@ import java.io.StringReader;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class NewTypeServletTest {
-    @Mock
-    private MeterService meterService;
-
-    @Mock
-    private HttpServletRequest req;
-
-    @Mock
-    private HttpServletResponse resp;
-
-    @Mock
-    ObjectMapper objectMapper;
-
+public class NewTypeServletTest extends ServletTest{
     @InjectMocks
     private NewTypeServlet newTypeServlet;
 
