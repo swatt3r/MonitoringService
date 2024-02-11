@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import org.monitoringservice.repositories.MeterRepository;
 import org.monitoringservice.repositories.UserRepository;
-import org.monitoringservice.services.AuditService;
 import org.monitoringservice.services.AuthenticationService;
 import org.monitoringservice.services.MeterService;
 import org.monitoringservice.util.MigrationUtil;
@@ -16,13 +15,18 @@ import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 import java.util.Properties;
 
+/**
+ * Класс ContextListener. Используется для инициализации контекста сервлетов.
+ */
 @WebListener
 public class ContextListener implements ServletContextListener {
-
+    /**
+     * Метод инициализации контекста.
+     *
+     * @param servletContextEvent событие контекста
+     */
     @Override
     public void contextInitialized(ServletContextEvent servletContextEvent) {
-        AuditService audit = new AuditService();
-
         Properties properties = PropertiesUtil.getApplicationProperties();
         MigrationUtil.migrateDB(properties);
 
@@ -38,10 +42,11 @@ public class ContextListener implements ServletContextListener {
         ServletContext context = servletContextEvent.getServletContext();
         context.setAttribute("authService", authenticationService);
         context.setAttribute("meterService", meterService);
-        context.setAttribute("auditService", audit);
         context.setAttribute("mapper", objectMapper);
     }
-
+    /**
+     * Метод разрушения контекста.
+     */
     @Override
     public void contextDestroyed(ServletContextEvent servletContextEvent) {
     }

@@ -5,6 +5,7 @@ import org.monitoringservice.dto.UserDTO;
 import org.monitoringservice.entities.Role;
 import org.monitoringservice.services.AuthenticationService;
 import org.monitoringservice.services.authexceptions.RegistrationException;
+import org.monitoringservice.util.DtoValidator;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -41,8 +42,9 @@ public class RegistrationServlet extends HttpServlet {
 
         try {
             UserDTO userDTO = objectMapper.readValue(json, UserDTO.class);
-
-            //Валидация данных
+            if(!DtoValidator.isValid(userDTO)){
+                throw new IOException();
+            }
             authenticationService.register(
                     userDTO.getLogin(),
                     userDTO.getPassword(),

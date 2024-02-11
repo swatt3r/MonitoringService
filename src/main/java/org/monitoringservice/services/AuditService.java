@@ -12,55 +12,74 @@ public class AuditService {
     /**
      * Поле для хранения действий пользователей.
      */
-    private final List<String> audit;
-
-    /**
-     * Создание сервиса аудита.
-     */
-    public AuditService() {
-        audit = new LinkedList<>();
-    }
+    private static final List<String> audit = new LinkedList<>();
 
     /**
      * Метод, обеспечивающий функцию добавления нового сообщения в аудит.
      *
-     * @param userLogin - логин пользователя, совершившего действие
-     * @param action    - тип действия
+     * @param userLogin логин пользователя, совершившего действие
+     * @param action    тип действия
      */
-    public void saveAction(String userLogin, TypeOfAction action) {
+    public static void saveAction(String userLogin, int id, TypeOfAction action) {
         switch (action) {
             case Actual:
+                if (id > 0) {
+                    audit.add("Пользователь " + id + " получил актуальные показания.");
+                    break;
+                }
                 audit.add("Пользователь " + userLogin + " получил актуальные показания.");
                 break;
             case NewMeter:
-                audit.add("Администратор " + userLogin + " добавил новый тип счетчика.");
+                audit.add("Администратор добавил новый тип счетчика.");
                 break;
             case AddMeter:
+                if (id > 0) {
+                    audit.add("Пользователь " + id + " зарегистрировал новый тип счетчика на себя.");
+                    break;
+                }
                 audit.add("Пользователь " + userLogin + " зарегистрировал новый тип счетчика на себя.");
                 break;
             case ShowUserMeter:
+                if (id > 0) {
+                    audit.add("Пользователь " + id + " получил актуальные счетчики в своем аккаунте.");
+                    break;
+                }
                 audit.add("Пользователь " + userLogin + " получил актуальные счетчики в своем аккаунте.");
                 break;
-            case ShowMeters:
-                audit.add("Пользователь " + userLogin + " получил актуальные счетчики.");
-                break;
             case Readout:
+                if (id > 0) {
+                    audit.add("Пользователь " + id + " подал новое показание.");
+                    break;
+                }
                 audit.add("Пользователь " + userLogin + " подал новое показание.");
                 break;
             case History:
+                if (id > 0) {
+                    audit.add("Пользователь " + id + " получил историю показаний.");
+                    break;
+                }
                 audit.add("Пользователь " + userLogin + " получил историю показаний.");
                 break;
             case MonthHistory:
+                if (id > 0) {
+                    audit.add("Пользователь " + id + " получил месячную историю показаний.");
+                    break;
+                }
                 audit.add("Пользователь " + userLogin + " получил месячную историю показаний.");
                 break;
             case Login:
+                if (id > 0) {
+                    audit.add("Пользователь " + id + " авторизовался.");
+                    break;
+                }
                 audit.add("Пользователь " + userLogin + " авторизовался.");
                 break;
             case Register:
+                if (id > 0) {
+                    audit.add("Пользователь " + id + " зарегистрировался.");
+                    break;
+                }
                 audit.add("Пользователь " + userLogin + " зарегистрировался.");
-                break;
-            case LogOut:
-                audit.add("Пользователь " + userLogin + " вышел из аккаунта.");
                 break;
             default:
                 break;

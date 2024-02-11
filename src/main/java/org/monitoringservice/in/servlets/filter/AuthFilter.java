@@ -7,12 +7,27 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 
+/**
+ * Класс веб фильтр. Используется для авторизации пользователя и проверки его сессии.
+ */
 @WebFilter("/api/*")
 public class AuthFilter implements Filter {
+    /**
+     * Метод инициализации фильтра.
+     *
+     * @param filterConfig конфигурация
+     */
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
     }
 
+    /**
+     * Метод, обеспечивающий фильтрацию. Выполняет проверку сессии пользователя на авторизацию.
+     *
+     * @param servletRequest  запрос к сервлету
+     * @param servletResponse ответ от сервлета
+     * @param filterChain     цепь фильтров
+     */
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
         HttpServletRequest req = (HttpServletRequest) servletRequest;
@@ -30,6 +45,9 @@ public class AuthFilter implements Filter {
         }
     }
 
+    /**
+     * Метод разрушения фильтра.
+     */
     @Override
     public void destroy() {
     }

@@ -1,10 +1,12 @@
 package org.monitoringservice.services;
 
+import org.monitoringservice.dto.UserDTO;
 import org.monitoringservice.entities.Role;
 import org.monitoringservice.entities.User;
 import org.monitoringservice.repositories.UserRepository;
 import org.monitoringservice.services.authexceptions.LoginException;
 import org.monitoringservice.services.authexceptions.RegistrationException;
+import org.monitoringservice.util.mapper.UserMapper;
 
 /**
  * Класс сервиса, который обрабатывает авторизацию и регистрацию.
@@ -32,13 +34,13 @@ public class AuthenticationService {
      * @return User - пользователь, который вошел в систему с заданным логином и паролем
      * @throws LoginException если неверный пароль или пользователя с таким логином не существует
      */
-    public User login(String login, String password) throws LoginException {
+    public UserDTO login(String login, String password) throws LoginException {
         User logUser = userRepo.findUserByLogin(login);
         if (logUser == null) {
             throw new LoginException("Пользователь с таким именем не существует!");
         }
         if (logUser.getPassword().equals(password)) {
-            return logUser;
+            return UserMapper.MAPPER.userToUserDTO(logUser);
         } else {
             throw new LoginException("Неверный пароль!");
         }

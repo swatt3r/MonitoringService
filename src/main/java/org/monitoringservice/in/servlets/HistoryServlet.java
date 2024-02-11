@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.monitoringservice.dto.AdminSearchDTO;
 import org.monitoringservice.entities.Role;
 import org.monitoringservice.services.MeterService;
+import org.monitoringservice.util.annotations.Loggable;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -15,18 +16,38 @@ import java.io.IOException;
 
 import static java.util.stream.Collectors.joining;
 
+/**
+ * Класс сервлета. Используется для обработки запросов на историю показаний.
+ */
+@Loggable
 @WebServlet("/api/history")
 public class HistoryServlet extends HttpServlet {
+    /**
+     * Поле для хранения маппера.
+     */
     private ObjectMapper objectMapper;
+    /**
+     * Поле для хранения сервиса счетчиков.
+     */
     private MeterService meterService;
 
-
+    /**
+     * Метод инициализации сервлета.
+     *
+     * @param config - конфигурация
+     */
     @Override
     public void init(ServletConfig config) throws ServletException {
         objectMapper = (ObjectMapper) config.getServletContext().getAttribute("mapper");
         meterService = (MeterService) config.getServletContext().getAttribute("meterService");
     }
 
+    /**
+     * Метод, обрабатывабщий GET запрос. В ответ посылает историю показаний, если не было ошибок.
+     *
+     * @param req  запрос к сервлету
+     * @param resp ответ от сервлета
+     */
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
         resp.setContentType("application/json");
@@ -53,6 +74,12 @@ public class HistoryServlet extends HttpServlet {
         }
     }
 
+    /**
+     * Метод, обрабатывабщий POST запрос. В ответ посылает историю показаний, если не было ошибок.
+     *
+     * @param req  запрос к сервлету
+     * @param resp ответ от сервлета
+     */
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         resp.setContentType("application/json");
