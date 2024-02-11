@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.monitoringservice.dto.UserDTO;
 import org.monitoringservice.dto.UserLoginDTO;
 import org.monitoringservice.services.AuthenticationService;
-import org.monitoringservice.services.LogService;
 import org.monitoringservice.services.authexceptions.LoginException;
 import org.monitoringservice.util.annotations.Loggable;
 
@@ -51,7 +50,7 @@ public class LoginServlet extends HttpServlet {
      * @param resp ответ от сервлета
      */
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         resp.setContentType("application/json");
 
         String json = req.getReader().lines().collect(joining());
@@ -63,8 +62,6 @@ public class LoginServlet extends HttpServlet {
             req.getSession().setAttribute("login", user.getLogin());
             req.getSession().setAttribute("role", user.getRole());
             req.getSession().setAttribute("id", user.getId());
-            resp.getOutputStream()
-                    .write(objectMapper.writeValueAsBytes(LogService.log.size()));
             resp.setStatus(HttpServletResponse.SC_OK);
         } catch (LoginException | IOException e) {
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);

@@ -50,7 +50,7 @@ public class NewMeterServlet extends HttpServlet {
      * @param resp ответ от сервлета
      */
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         resp.setContentType("application/json");
         Role sessionRole = (Role) req.getSession().getAttribute("role");
         int id = (int) req.getSession().getAttribute("id");

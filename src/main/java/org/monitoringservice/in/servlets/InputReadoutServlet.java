@@ -50,7 +50,7 @@ public class InputReadoutServlet extends HttpServlet {
      * @param resp ответ от сервлета
      */
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         resp.setContentType("application/json");
         Role sessionRole = (Role) req.getSession().getAttribute("role");
         int id = (int) req.getSession().getAttribute("id");
@@ -64,7 +64,7 @@ public class InputReadoutServlet extends HttpServlet {
 
         try {
             NewReadoutDTO newReadoutDTO = objectMapper.readValue(json, NewReadoutDTO.class);
-            meterService.newReadout(id, newReadoutDTO.getType(), newReadoutDTO.getReadOut());
+            meterService.newReadout(id, newReadoutDTO.getType(), newReadoutDTO.getReadout());
             resp.setStatus(HttpServletResponse.SC_OK);
         } catch (IOException | ReadoutException e) {
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);

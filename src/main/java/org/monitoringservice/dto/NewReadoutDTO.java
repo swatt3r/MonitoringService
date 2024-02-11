@@ -14,5 +14,5 @@ public class NewReadoutDTO {
     /**
      * Поле для хранения показания.
      */
-    private int readOut;
+    private int readout;
 }

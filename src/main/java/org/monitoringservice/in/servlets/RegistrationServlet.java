@@ -30,13 +30,8 @@ public class RegistrationServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         resp.setContentType("application/json");
-
-        if (req.getSession().getAttribute("id") != null){
-            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            return;
-        }
 
         String json = req.getReader().lines().collect(joining());
 

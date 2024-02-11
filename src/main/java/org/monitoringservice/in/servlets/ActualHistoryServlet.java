@@ -49,7 +49,7 @@ public class ActualHistoryServlet extends HttpServlet {
      * @param resp  ответ от сервлета
      */
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
+    public void doGet(HttpServletRequest req, HttpServletResponse resp) {
         resp.setContentType("application/json");
         Role sessionRole = (Role) req.getSession().getAttribute("role");
         int id = (int) req.getSession().getAttribute("id");
