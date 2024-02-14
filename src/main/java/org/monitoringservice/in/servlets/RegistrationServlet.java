@@ -17,7 +17,7 @@ import java.io.IOException;
 
 import static java.util.stream.Collectors.joining;
 
-@WebServlet("/register")
+@WebServlet("/registration")
 public class RegistrationServlet extends HttpServlet {
     private ObjectMapper objectMapper;
     private AuthenticationService authenticationService;
@@ -37,10 +37,12 @@ public class RegistrationServlet extends HttpServlet {
 
         try {
             UserDTO userDTO = objectMapper.readValue(json, UserDTO.class);
-            if(!DtoValidator.isValid(userDTO)){
+            String validation = DtoValidator.isValid(userDTO);
+            if(validation != null){
+                resp.getWriter().println(validation);
                 throw new IOException();
             }
-            authenticationService.register(
+            authenticationService.addNewUser(
                     userDTO.getLogin(),
                     userDTO.getPassword(),
                     Role.USER,
@@ -50,7 +52,10 @@ public class RegistrationServlet extends HttpServlet {
                     userDTO.getApartmentNumber()
             );
             resp.setStatus(HttpServletResponse.SC_OK);
-        } catch (RegistrationException | IOException e) {
+        } catch (IOException e) {
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+        }catch (RegistrationException e){
+            resp.getWriter().println(e.getMessage());
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         }
     }

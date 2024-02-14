@@ -5,7 +5,7 @@ import org.monitoringservice.dto.MeterTypeDTO;
 import org.monitoringservice.entities.Role;
 import org.monitoringservice.services.MeterService;
 import org.monitoringservice.services.meterexecptions.MeterAddException;
-import org.monitoringservice.util.annotations.Loggable;
+import org.monitoringservice.util.DtoValidator;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -20,7 +20,6 @@ import static java.util.stream.Collectors.joining;
 /**
  * Класс сервлета. Используется для обработки запросов на добавление нового типа счетчиков.
  */
-@Loggable
 @WebServlet("/api/newType")
 public class NewTypeServlet extends HttpServlet {
     /**
@@ -62,9 +61,19 @@ public class NewTypeServlet extends HttpServlet {
 
         try {
             MeterTypeDTO meterTypeDTO = objectMapper.readValue(json, MeterTypeDTO.class);
+
+            String validation = DtoValidator.isValid(meterTypeDTO);
+            if(validation != null){
+                resp.getWriter().println(validation);
+                throw  new IOException();
+            }
+
             meterService.addNewType(meterTypeDTO.getType());
             resp.setStatus(HttpServletResponse.SC_OK);
-        } catch (IOException | MeterAddException e) {
+        } catch (IOException e) {
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+        }catch (MeterAddException e){
+            resp.getWriter().println(e.getMessage());
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         }
     }

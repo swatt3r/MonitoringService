@@ -8,5 +8,8 @@
         <sql>
             CREATE SCHEMA IF NOT EXISTS monitoring;
         </sql>
+        <sql>
+            CREATE SCHEMA IF NOT EXISTS util;
+        </sql>
     </changeSet>
 </databaseChangeLog>

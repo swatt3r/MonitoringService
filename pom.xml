@@ -33,7 +33,7 @@
         <mapstruct.version>1.5.5.Final</mapstruct.version>
         <mapstructprocessor.version>1.5.5.Final</mapstructprocessor.version>
 
-        <aspectj.version>1.9.20.1</aspectj.version>
+        <aspectj.version>1.9.7</aspectj.version>
         <plugin.aspectj.version>1.14.0</plugin.aspectj.version>
         <aspectjweaver.version>1.9.19</aspectjweaver.version>
         <aspectjtools.version>1.8.9</aspectjtools.version>
@@ -146,9 +146,9 @@
                 <artifactId>aspectj-maven-plugin</artifactId>
                 <version>${plugin.aspectj.version}</version>
                 <configuration>
-                    <complianceLevel>17</complianceLevel>
-                    <source>17</source>
-                    <target>17</target>
+                    <complianceLevel>1.6</complianceLevel>
+                    <source>1.6</source>
+                    <target>1.6</target>
                     <showWeaveInfo>true</showWeaveInfo>
                     <verbose>true</verbose>
                     <Xlint>ignore</Xlint>

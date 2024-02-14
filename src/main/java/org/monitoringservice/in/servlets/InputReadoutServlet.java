@@ -5,7 +5,7 @@ import org.monitoringservice.dto.NewReadoutDTO;
 import org.monitoringservice.entities.Role;
 import org.monitoringservice.services.MeterService;
 import org.monitoringservice.services.meterexecptions.ReadoutException;
-import org.monitoringservice.util.annotations.Loggable;
+import org.monitoringservice.util.DtoValidator;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -20,8 +20,7 @@ import static java.util.stream.Collectors.joining;
 /**
  * Класс сервлета. Используется для обработки запросов на новое показание.
  */
-@Loggable
-@WebServlet("/api/input")
+@WebServlet("/api/newReadout")
 public class InputReadoutServlet extends HttpServlet {
     /**
      * Поле для хранения маппера.
@@ -53,7 +52,13 @@ public class InputReadoutServlet extends HttpServlet {
     public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         resp.setContentType("application/json");
         Role sessionRole = (Role) req.getSession().getAttribute("role");
-        int id = (int) req.getSession().getAttribute("id");
+        int id;
+        try {
+            id = Integer.parseInt(req.getSession().getAttribute("id").toString());
+        }catch (NumberFormatException e){
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            return;
+        }
 
         if (sessionRole != Role.USER) {
             resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
@@ -64,9 +69,19 @@ public class InputReadoutServlet extends HttpServlet {
 
         try {
             NewReadoutDTO newReadoutDTO = objectMapper.readValue(json, NewReadoutDTO.class);
+
+            String validation = DtoValidator.isValid(newReadoutDTO);
+            if(validation != null){
+                resp.getWriter().println(validation);
+                throw  new IOException();
+            }
+
             meterService.newReadout(id, newReadoutDTO.getType(), newReadoutDTO.getReadout());
             resp.setStatus(HttpServletResponse.SC_OK);
-        } catch (IOException | ReadoutException e) {
+        } catch (IOException e) {
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+        }catch (ReadoutException e){
+            resp.getWriter().println(e.getMessage());
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         }
     }

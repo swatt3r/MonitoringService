@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.monitoringservice.dto.AdminSearchDTO;
 import org.monitoringservice.entities.Role;
 import org.monitoringservice.services.MeterService;
-import org.monitoringservice.util.annotations.Loggable;
+import org.monitoringservice.util.DtoValidator;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -19,7 +19,6 @@ import static java.util.stream.Collectors.joining;
 /**
  * Класс сервлета. Используется для обработки запросов на актуальную историю показаний.
  */
-@Loggable
 @WebServlet("/api/actual")
 public class ActualHistoryServlet extends HttpServlet {
     /**
@@ -52,7 +51,13 @@ public class ActualHistoryServlet extends HttpServlet {
     public void doGet(HttpServletRequest req, HttpServletResponse resp) {
         resp.setContentType("application/json");
         Role sessionRole = (Role) req.getSession().getAttribute("role");
-        int id = (int) req.getSession().getAttribute("id");
+        int id;
+        try {
+            id = Integer.parseInt(req.getSession().getAttribute("id").toString());
+        }catch (NumberFormatException e){
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            return;
+        }
 
         resp.setStatus(HttpServletResponse.SC_OK);
         try {
@@ -93,6 +98,11 @@ public class ActualHistoryServlet extends HttpServlet {
 
         try {
             AdminSearchDTO adminSearchDTO = objectMapper.readValue(json, AdminSearchDTO.class);
+            String validation = DtoValidator.isValid(adminSearchDTO);
+            if(validation != null){
+                resp.getWriter().println(validation);
+                throw  new IOException();
+            }
             resp.setStatus(HttpServletResponse.SC_OK);
             resp.getOutputStream()
                     .write(objectMapper.writeValueAsBytes(meterService.getActualForAdmin(adminSearchDTO.getLogin())));

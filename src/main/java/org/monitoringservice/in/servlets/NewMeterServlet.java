@@ -5,7 +5,7 @@ import org.monitoringservice.dto.MeterTypeDTO;
 import org.monitoringservice.entities.Role;
 import org.monitoringservice.services.MeterService;
 import org.monitoringservice.services.meterexecptions.MeterAddException;
-import org.monitoringservice.util.annotations.Loggable;
+import org.monitoringservice.util.DtoValidator;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -20,7 +20,6 @@ import static java.util.stream.Collectors.joining;
 /**
  * Класс сервлета. Используется для обработки запросов на добавление нового счетчика.
  */
-@Loggable
 @WebServlet("/api/newMeter")
 public class NewMeterServlet extends HttpServlet {
     /**
@@ -53,7 +52,13 @@ public class NewMeterServlet extends HttpServlet {
     public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         resp.setContentType("application/json");
         Role sessionRole = (Role) req.getSession().getAttribute("role");
-        int id = (int) req.getSession().getAttribute("id");
+        int id;
+        try {
+            id = Integer.parseInt(req.getSession().getAttribute("id").toString());
+        }catch (NumberFormatException e){
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            return;
+        }
 
         if (sessionRole != Role.USER) {
             resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
@@ -64,9 +69,19 @@ public class NewMeterServlet extends HttpServlet {
 
         try {
             MeterTypeDTO meterTypeDTO = objectMapper.readValue(json, MeterTypeDTO.class);
+
+            String validation = DtoValidator.isValid(meterTypeDTO);
+            if(validation != null){
+                resp.getWriter().println(validation);
+                throw  new IOException();
+            }
+
             meterService.addNewMeterToUser(id, meterTypeDTO.getType());
             resp.setStatus(HttpServletResponse.SC_OK);
-        } catch (IOException | MeterAddException e) {
+        } catch (IOException e) {
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+        }catch (MeterAddException e){
+            resp.getWriter().println(e.getMessage());
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         }
     }

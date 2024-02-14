@@ -75,7 +75,7 @@ class AuthServiceTest {
                 .thenReturn(new User(1, "user", "user", Role.USER, "city", "str", 11, 12));
 
         assertThatThrownBy(() ->
-                authService.register("user", "user", Role.USER, "city", "str", 11, 12))
+                authService.addNewUser("user", "user", Role.USER, "city", "str", 11, 12))
                 .isInstanceOf(RegistrationException.class)
                 .hasMessageContaining("Пользователь с таким именем уже существует!");
     }
@@ -86,7 +86,7 @@ class AuthServiceTest {
         Mockito.when(userRepo.findUserByFullAddress("city", "str", 11, 12))
                 .thenReturn(new User(1, "user", "user", Role.USER, "city", "str", 11, 12));
         assertThatThrownBy(() ->
-                authService.register("newUser", "user", Role.USER, "city", "str", 11, 12))
+                authService.addNewUser("newUser", "user", Role.USER, "city", "str", 11, 12))
                 .isInstanceOf(RegistrationException.class)
                 .hasMessageContaining("Пользователь с данным адресом уже существует!");
     }
@@ -99,7 +99,7 @@ class AuthServiceTest {
         Mockito.when(userRepo.findUserByFullAddress("city", "str", 11, 12))
                 .thenReturn(null);
         try {
-            authService.register("newUser", "user", Role.USER, "city", "str", 11, 12);
+            authService.addNewUser("newUser", "user", Role.USER, "city", "str", 11, 12);
         } catch (RegistrationException e) {
             Assertions.fail("Неправильная регистрация");
         }

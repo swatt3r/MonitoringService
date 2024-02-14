@@ -3,7 +3,6 @@ package org.monitoringservice.in.servlets;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.monitoringservice.entities.Role;
 import org.monitoringservice.services.MeterService;
-import org.monitoringservice.util.annotations.Loggable;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -16,7 +15,6 @@ import java.io.IOException;
 /**
  * Класс сервлета. Используется для обработки запросов на список счетчиков пользователя.
  */
-@Loggable
 @WebServlet("/api/showMeters")
 public class ShowUserMetersServlet extends HttpServlet {
     /**
@@ -49,7 +47,13 @@ public class ShowUserMetersServlet extends HttpServlet {
     public void doGet(HttpServletRequest req, HttpServletResponse resp) {
         resp.setContentType("application/json");
         Role sessionRole = (Role) req.getSession().getAttribute("role");
-        int id = (int) req.getSession().getAttribute("id");
+        int id;
+        try {
+            id = Integer.parseInt(req.getSession().getAttribute("id").toString());
+        }catch (NumberFormatException e){
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            return;
+        }
 
         resp.setStatus(HttpServletResponse.SC_OK);
         try {

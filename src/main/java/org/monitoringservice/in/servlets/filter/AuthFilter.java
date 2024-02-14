@@ -35,8 +35,15 @@ public class AuthFilter implements Filter {
 
         HttpSession session = req.getSession();
 
-        String login = (String) session.getAttribute("login");
-        Integer id = (Integer) session.getAttribute("id");
+        String login;
+        Integer id;
+        try {
+            login = (String) session.getAttribute("login");
+            id = Integer.parseInt(req.getSession().getAttribute("id").toString());
+        } catch (NumberFormatException | NullPointerException e) {
+            res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            return;
+        }
 
         if (login != null && id != null) {
             filterChain.doFilter(servletRequest, servletResponse);

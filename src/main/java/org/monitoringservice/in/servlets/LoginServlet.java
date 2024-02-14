@@ -5,7 +5,7 @@ import org.monitoringservice.dto.UserDTO;
 import org.monitoringservice.dto.UserLoginDTO;
 import org.monitoringservice.services.AuthenticationService;
 import org.monitoringservice.services.authexceptions.LoginException;
-import org.monitoringservice.util.annotations.Loggable;
+import org.monitoringservice.util.DtoValidator;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -20,7 +20,6 @@ import static java.util.stream.Collectors.joining;
 /**
  * Класс сервлета. Используется для обработки авторизации.
  */
-@Loggable
 @WebServlet("/login")
 public class LoginServlet extends HttpServlet {
     /**
@@ -58,12 +57,21 @@ public class LoginServlet extends HttpServlet {
         try {
             UserLoginDTO userLoginDTO = objectMapper.readValue(json, UserLoginDTO.class);
 
+            String validation = DtoValidator.isValid(userLoginDTO);
+            if(validation != null){
+                resp.getWriter().println(validation);
+                throw  new IOException();
+            }
+
             UserDTO user = authenticationService.login(userLoginDTO.getLogin(), userLoginDTO.getPassword());
             req.getSession().setAttribute("login", user.getLogin());
             req.getSession().setAttribute("role", user.getRole());
             req.getSession().setAttribute("id", user.getId());
             resp.setStatus(HttpServletResponse.SC_OK);
-        } catch (LoginException | IOException e) {
+        } catch (IOException e) {
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+        }catch (LoginException e){
+            resp.getWriter().println(e.getMessage());
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         }
     }

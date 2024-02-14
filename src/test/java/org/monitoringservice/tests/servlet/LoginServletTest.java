@@ -18,7 +18,9 @@ import org.monitoringservice.util.mapper.UserMapper;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.BufferedReader;
+import java.io.PrintWriter;
 import java.io.StringReader;
+import java.io.StringWriter;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -39,7 +41,7 @@ public class LoginServletTest extends ServletTest{
         BufferedReader reader = new BufferedReader(new StringReader("json"));
 
         when(req.getReader()).thenReturn(reader);
-        when(authService.login("user", "user")).thenReturn(user);
+        when(authService.login("user2", "user2")).thenReturn(user);
         when(objectMapper.readValue("json", UserLoginDTO.class)).thenReturn(userLoginList.get(0));
 
         HttpSession session = Mockito.mock(HttpSession.class);
@@ -57,6 +59,7 @@ public class LoginServletTest extends ServletTest{
         BufferedReader reader = new BufferedReader(new StringReader("json"));
 
         when(req.getReader()).thenReturn(reader);
+        when(resp.getWriter()).thenReturn(new PrintWriter(new StringWriter()));
         when(authService.login("user", "admin")).thenThrow(new LoginException("Неверный пароль"));
         when(objectMapper.readValue("json", UserLoginDTO.class)).thenReturn(userLoginList.get(1));
 
@@ -71,12 +74,12 @@ public class LoginServletTest extends ServletTest{
     public void createData(){
         userLoginList = new LinkedList<>();
         user = UserMapper.MAPPER.userToUserDTO(
-                new User(-1,"user", "user", Role.USER, "city", "street", 12, 12)
+                new User(-1,"user2", "user2", Role.USER, "city", "street", 12, 12)
         );
 
         UserLoginDTO first = new UserLoginDTO();
-        first.setLogin("user");
-        first.setPassword("user");
+        first.setLogin("user2");
+        first.setPassword("user2");
         userLoginList.add(first);
 
         UserLoginDTO second = new UserLoginDTO();
