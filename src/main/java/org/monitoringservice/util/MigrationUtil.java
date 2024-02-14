@@ -22,7 +22,12 @@ public class MigrationUtil {
      *
      * @param properties параметры приложения, в которых должна быть информация о подключении к БД и дериктории, где находится changeLogFile
      */
-    public static void migrateDB(Properties properties) {
+    public static void migrateDB(Properties properties){
+        try {
+            Class.forName("org.postgresql.Driver");
+        }catch (ClassNotFoundException e){
+            System.out.println(e.getMessage());
+        }
         try (Connection connection = DriverManager.getConnection(
                 properties.getProperty("url"),
                 properties.getProperty("username"),

@@ -1,10 +1,14 @@
 package org.monitoringservice.services;
 
+import org.monitoringservice.dto.UserDTO;
 import org.monitoringservice.entities.Role;
+import org.monitoringservice.entities.TypeOfAction;
 import org.monitoringservice.entities.User;
 import org.monitoringservice.repositories.UserRepository;
 import org.monitoringservice.services.authexceptions.LoginException;
 import org.monitoringservice.services.authexceptions.RegistrationException;
+import org.monitoringservice.util.annotations.Audit;
+import org.monitoringservice.util.mapper.UserMapper;
 
 /**
  * Класс сервиса, который обрабатывает авторизацию и регистрацию.
@@ -32,13 +36,14 @@ public class AuthenticationService {
      * @return User - пользователь, который вошел в систему с заданным логином и паролем
      * @throws LoginException если неверный пароль или пользователя с таким логином не существует
      */
-    public User login(String login, String password) throws LoginException {
+    @Audit(typeOfAction = TypeOfAction.Login, haveLogin = true, identifierPos = 0)
+    public UserDTO login(String login, String password) throws LoginException {
         User logUser = userRepo.findUserByLogin(login);
         if (logUser == null) {
             throw new LoginException("Пользователь с таким именем не существует!");
         }
         if (logUser.getPassword().equals(password)) {
-            return logUser;
+            return UserMapper.MAPPER.userToUserDTO(logUser);
         } else {
             throw new LoginException("Неверный пароль!");
         }
@@ -56,7 +61,8 @@ public class AuthenticationService {
      * @param apartmentNumber номер квартиры
      * @throws RegistrationException если пользователь с таким именем уже есть или на заданной адрес уже зарегистрирован другой пользователь
      */
-    public void register(String login, String password, Role role, String city, String street,
+    @Audit(typeOfAction = TypeOfAction.Register, haveLogin = true, identifierPos = 0)
+    public void addNewUser(String login, String password, Role role, String city, String street,
                               int houseNumber, int apartmentNumber) throws RegistrationException {
         User regUser = userRepo.findUserByLogin(login);
         if (regUser != null) {
