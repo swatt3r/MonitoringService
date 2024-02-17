@@ -8,6 +8,8 @@ import org.monitoringservice.repositories.UserRepository;
 import org.monitoringservice.services.meterexecptions.MeterAddException;
 import org.monitoringservice.services.meterexecptions.ReadoutException;
 import org.monitoringservice.util.annotations.Audit;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.Calendar;
@@ -17,6 +19,7 @@ import java.util.List;
 /**
  * Класс сервиса, который работает со счетчиками и их показаниями.
  */
+@Service
 public class MeterService {
     /**
      * Поле с репозиторием истории показаний и счетчиков.
@@ -34,6 +37,7 @@ public class MeterService {
      * @param userRepo    - репозиторий пользователей
      * @param historyRepo - репозиторий истории показаний и счетчиков
      */
+    @Autowired
     public MeterService(UserRepository userRepo, MeterRepository historyRepo) {
         this.meterRepository = historyRepo;
         this.userRepo = userRepo;

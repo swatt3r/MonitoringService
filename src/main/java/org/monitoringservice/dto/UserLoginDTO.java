@@ -5,6 +5,7 @@ import lombok.Data;
 /**
  * Класс описывающий DTO пользователя. Используется во время авторизации.
  */
+
 @Data
 public class UserLoginDTO {
     /**

@@ -1,0 +1,5 @@
+url: jdbc:postgresql://localhost:5432/monitorService
+username: user
+password: secret
+
+changeLogFile: db/changelog/changelog.xml

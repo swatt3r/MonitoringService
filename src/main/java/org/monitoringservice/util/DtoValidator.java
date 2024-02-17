@@ -17,7 +17,7 @@ public class DtoValidator {
             if(userDTO.getLogin().length() < 4){
                 return "Логин слишком короткий!";
             }
-            if (userDTO.getPassword().length() < 5){
+            if (userDTO.getPassword().length() < 4){
                 return "Пароль слишком короткий!";
             }
             if (userDTO.getCity().length() < 2){
@@ -118,7 +118,7 @@ public class DtoValidator {
             if(userLoginDTO.getLogin().length() < 4){
                 return "Логин слишком короткий!";
             }
-            if (userLoginDTO.getPassword().length() < 5){
+            if (userLoginDTO.getPassword().length() < 4){
                 return "Пароль слишком короткий!";
             }
         }catch (NullPointerException e){

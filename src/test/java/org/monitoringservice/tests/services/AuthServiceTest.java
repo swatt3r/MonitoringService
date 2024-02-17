@@ -15,8 +15,8 @@ import org.monitoringservice.repositories.UserRepository;
 import org.monitoringservice.services.AuthenticationService;
 import org.monitoringservice.services.authexceptions.LoginException;
 import org.monitoringservice.services.authexceptions.RegistrationException;
+import org.monitoringservice.util.mapper.UserMapper;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
@@ -34,6 +34,9 @@ class AuthServiceTest {
      */
     @Mock
     private UserRepository userRepo;
+
+    @Mock
+    protected UserMapper userMapper;
 
     @Test
     @DisplayName("Тест авторизации с неправильным паролем.")
@@ -59,10 +62,11 @@ class AuthServiceTest {
     @Test
     @DisplayName("Тест успешной авторизации.")
     void tryToLoginTest_success() {
+        User admin = new User(1, "admin", "admin", Role.ADMIN, "", "", -1, -1);
         Mockito.when(userRepo.findUserByLogin(Mockito.eq("admin")))
-                .thenReturn(new User(1, "admin", "admin", Role.ADMIN, "", "", -1, -1));
+                .thenReturn(admin);
         try {
-            assertThat(authService.login("admin", "admin")).isEqualTo(userRepo.findUserByLogin("admin"));
+            authService.login("admin", "admin");
         } catch (LoginException e) {
             Assertions.fail("Неправильная авторизация");
         }

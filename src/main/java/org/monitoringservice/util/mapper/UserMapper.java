@@ -8,7 +8,7 @@ import org.monitoringservice.entities.User;
 /**
  * Интерфейс маппера. Используется для преобразования User в UserDTO.
  */
-@Mapper
+@Mapper(componentModel = "spring")
 public interface UserMapper {
     /**
      * Поле для хранения маппера. Создано, чтобы не писать реализацию интерфейса.

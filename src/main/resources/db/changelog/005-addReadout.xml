@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="005-addReadout" author="admin">
+        <insert tableName="users_meters" schemaName="monitoring">
+            <column name="user_id" value="47"/>
+            <column name="type" value="Heat"/>
+        </insert>
+        <insert tableName="meter_history" schemaName="monitoring">
+            <column name="user_id" value="47"/>
+            <column name="type" value="Heat"/>
+            <column name="date" value="2023-12-19"/>
+            <column name="value" valueNumeric="56"/>
+        </insert>
+    </changeSet>
+</databaseChangeLog>

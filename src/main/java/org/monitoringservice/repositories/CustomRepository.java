@@ -5,17 +5,17 @@ import org.monitoringservice.util.PropertiesUtil;
 /**
  * Интерфейс репозитория.
  */
-public interface Repository {
+public interface CustomRepository {
     /**
      * Поле URL для подключения с БД.
      */
-    String URL = PropertiesUtil.getApplicationProperties().getProperty("url");
+    String URL = (String) PropertiesUtil.getApplicationProperties().get("url");
     /**
      * Поле USERNAME для подключения с БД.
      */
-    String USERNAME = PropertiesUtil.getApplicationProperties().getProperty("username");
+    String USERNAME = (String) PropertiesUtil.getApplicationProperties().get("username");
     /**
      * Поле PASSWORD для подключения с БД.
      */
-    String PASSWORD = PropertiesUtil.getApplicationProperties().getProperty("password");
+    String PASSWORD = (String) PropertiesUtil.getApplicationProperties().get("password");
 }

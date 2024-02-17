@@ -2,10 +2,12 @@ package org.monitoringservice.services;
 
 import org.monitoringservice.entities.TypeOfAction;
 import org.monitoringservice.repositories.UtilRepository;
+import org.springframework.stereotype.Service;
 
 /**
  * Класс аудита.
  */
+@Service
 public class AuditService {
     /**
      * Метод, обеспечивающий функцию добавления нового сообщения в аудит.

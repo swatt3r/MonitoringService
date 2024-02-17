@@ -1,7 +1,10 @@
 package org.monitoringservice.tests.repository;
 
 
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.monitoringservice.entities.Role;
 import org.monitoringservice.entities.User;
 import org.monitoringservice.repositories.UserRepository;
@@ -11,7 +14,7 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.util.List;
-import java.util.Properties;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -23,15 +26,15 @@ public class UserRepositoryTest {
     /**
      * Поле с конфигурациями приложения.
      */
-    private static final Properties properties = PropertiesUtil.getApplicationProperties();
+    private static final Map<String, Object> properties = PropertiesUtil.getApplicationProperties();
     /**
      * Поле с контейнером БД.
      */
     private static final PostgreSQLContainer<?> bdContainer =
             new PostgreSQLContainer<>("postgres:latest")
                     .withDatabaseName("monitorService")
-                    .withUsername(properties.getProperty("username"))
-                    .withPassword(properties.getProperty("password"));
+                    .withUsername((String) properties.get("username"))
+                    .withPassword((String) properties.get("password"));
     /**
      * Поле с репозиторием.
      */
@@ -80,8 +83,8 @@ public class UserRepositoryTest {
     void saveAndFindUserByAddressTest() {
         userRepository.save(
                 new User(-1,
-                        "user3",
-                        "user3",
+                        "user2",
+                        "user2",
                         Role.USER,
                         "Test",
                         "Test",
@@ -89,9 +92,9 @@ public class UserRepositoryTest {
                         15)
         );
         User getUser = userRepository.findUserByFullAddress("Test", "Test", 12, 15);
-        assertThat(getUser.getLogin()).isEqualTo("user3");
+        assertThat(getUser.getLogin()).isEqualTo("user2");
         assertThat(getUser.getRole().toString()).isEqualTo("USER");
-        assertThat(getUser.getPassword()).isEqualTo("user3");
+        assertThat(getUser.getPassword()).isEqualTo("user2");
     }
 
     @Test

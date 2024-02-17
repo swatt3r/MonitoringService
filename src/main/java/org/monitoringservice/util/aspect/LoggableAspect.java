@@ -4,11 +4,13 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.monitoringservice.services.LogService;
+import org.springframework.stereotype.Component;
 
 /**
  * Класс аспекта. Используется для логгирования выполнения методов.
  */
 @Aspect
+@Component
 public class LoggableAspect {
     /**
      * Метод, обрабатывающий логгирование выполнения методов.

@@ -7,6 +7,7 @@ import org.aspectj.lang.reflect.MethodSignature;
 import org.monitoringservice.entities.TypeOfAction;
 import org.monitoringservice.services.AuditService;
 import org.monitoringservice.util.annotations.Audit;
+import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
 
@@ -14,6 +15,7 @@ import java.lang.reflect.Method;
  * Класс аспекта. Используется для аудирования.
  */
 @Aspect
+@Component
 public class AuditAspect {
     /**
      * Метод, обрабатывающий аудирование.

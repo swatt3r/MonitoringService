@@ -10,7 +10,7 @@ import liquibase.resource.ClassLoaderResourceAccessor;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.Properties;
+import java.util.Map;
 
 /**
  * Класс отвечающий за миграцию БД.
@@ -22,20 +22,20 @@ public class MigrationUtil {
      *
      * @param properties параметры приложения, в которых должна быть информация о подключении к БД и дериктории, где находится changeLogFile
      */
-    public static void migrateDB(Properties properties){
+    public static void migrateDB(Map<String, Object> properties) {
         try {
             Class.forName("org.postgresql.Driver");
-        }catch (ClassNotFoundException e){
+        } catch (ClassNotFoundException e) {
             System.out.println(e.getMessage());
         }
         try (Connection connection = DriverManager.getConnection(
-                properties.getProperty("url"),
-                properties.getProperty("username"),
-                properties.getProperty("password"))) {
+                (String) properties.get("url"),
+                (String) properties.get("username"),
+                (String) properties.get("password"))) {
             Database database =
                     DatabaseFactory.getInstance().findCorrectDatabaseImplementation(new JdbcConnection(connection));
             Liquibase liquibase =
-                    new Liquibase(properties.getProperty("changeLogFile"), new ClassLoaderResourceAccessor(), database);
+                    new Liquibase((String) properties.get("changeLogFile"), new ClassLoaderResourceAccessor(), database);
             liquibase.update();
         } catch (SQLException | LiquibaseException e) {
             System.out.println(e.getMessage());

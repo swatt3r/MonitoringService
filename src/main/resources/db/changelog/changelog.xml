@@ -8,4 +8,5 @@
     <include file="002-create-sequence-and-create-tables.xml" relativeToChangelogFile="true"/>
     <include file="003-foreign-keys.xml" relativeToChangelogFile="true"/>
     <include file="004-add-data.xml" relativeToChangelogFile="true"/>
+    <include file="005-addReadout.xml" relativeToChangelogFile="true"/>
 </databaseChangeLog>

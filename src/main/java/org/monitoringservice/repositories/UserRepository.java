@@ -2,6 +2,7 @@ package org.monitoringservice.repositories;
 
 import org.monitoringservice.entities.Role;
 import org.monitoringservice.entities.User;
+import org.springframework.stereotype.Repository;
 
 import java.sql.*;
 import java.util.LinkedList;
@@ -10,7 +11,8 @@ import java.util.List;
 /**
  * Класс репозитория пользователей.
  */
-public class UserRepository implements Repository {
+@Repository
+public class UserRepository implements CustomRepository {
     /**
      * Метод получения пользователя по логину.
      *

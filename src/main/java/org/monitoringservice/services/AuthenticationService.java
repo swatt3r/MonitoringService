@@ -9,10 +9,13 @@ import org.monitoringservice.services.authexceptions.LoginException;
 import org.monitoringservice.services.authexceptions.RegistrationException;
 import org.monitoringservice.util.annotations.Audit;
 import org.monitoringservice.util.mapper.UserMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 /**
  * Класс сервиса, который обрабатывает авторизацию и регистрацию.
  */
+@Service
 public class AuthenticationService {
     /**
      * Поле с репозиторием пользователей.
@@ -24,6 +27,7 @@ public class AuthenticationService {
      *
      * @param userRepo - репозиторий пользователей
      */
+    @Autowired
     public AuthenticationService(UserRepository userRepo) {
         this.userRepo = userRepo;
     }

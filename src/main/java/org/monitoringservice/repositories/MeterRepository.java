@@ -1,6 +1,7 @@
 package org.monitoringservice.repositories;
 
 import org.monitoringservice.entities.MeterReading;
+import org.springframework.stereotype.Repository;
 
 import java.sql.*;
 import java.time.LocalDate;
@@ -10,7 +11,8 @@ import java.util.List;
 /**
  * Класс репозитория истории показаний и счетчиков.
  */
-public class MeterRepository implements Repository {
+@Repository
+public class MeterRepository implements CustomRepository {
     /**
      * Метод получения истории показаний конкретного пользователя из БД.
      *
