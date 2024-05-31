@@ -1,4 +1,3 @@
-# YlabIntenseSwatter
 # Monitoring Service
 Monitoring Service - консольное приложение для подачи показаний счетчиков отопления, горячей и холодной воды.
 # Запуск приложения
