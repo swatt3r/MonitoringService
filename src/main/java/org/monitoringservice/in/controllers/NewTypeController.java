@@ -16,15 +16,32 @@ import org.springframework.web.bind.annotation.RestController;
 
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 
+/**
+ * Класс контроллера, который отвечает за регистрацию новых типов счетчиков.
+ * Обрабатывает запросы POST, с адресом "api/newType".
+ */
 @RestController
 public class NewTypeController {
+    /**
+     * Поле с сервисом для работы со счетчиками.
+     */
     private final MeterService meterService;
-
+    /**
+     * Конструктор для внедерния зависимости.
+     */
     @Autowired
     public NewTypeController(MeterService meterService) {
         this.meterService = meterService;
     }
-
+    /**
+     * Метод, который обрабатывает запросы POST с адресом "api/newType". Совершает регистрацию новых типов счетчиков.
+     *
+     * @param meterTypeDTO DTO для типа счетчика
+     * @param request запрос
+     * @return ResponseEntity&lt;Object&gt; - при успешной регистрации нового типа счетчика возвращает статус 200(OK).
+     * <p>Если запрос посылает не администратор, то в ответе будет статус 401(UNAUTHORIZED).</p>
+     * <p>Если совершена ошибка в запросе, возвращает статус 400(BAD_REQUEST).</p>
+     */
     @PostMapping(value = "/api/newType", produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> newType(@RequestBody MeterTypeDTO meterTypeDTO, HttpServletRequest request) {
         HttpSession session = request.getSession();

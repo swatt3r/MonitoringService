@@ -16,15 +16,32 @@ import org.springframework.web.bind.annotation.RestController;
 
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 
+/**
+ * Класс контроллера, который отвечает за актуальную историю показаний.
+ * Обрабатывает запросы GET и POST, с адресом "api/actual".
+ */
 @RestController
 public class ActualHistoryController {
+    /**
+     * Поле с сервисом для работы со счетчиками.
+     */
     private final MeterService meterService;
 
+    /**
+     * Конструктор для внедерния зависимости.
+     */
     @Autowired
     public ActualHistoryController(MeterService meterService) {
         this.meterService = meterService;
     }
 
+    /**
+     * Метод, который обрабатывает запросы GET с адресом "api/actual".
+     *
+     * @param request запрос
+     * @return ResponseEntity&lt;Object&gt; - ответ, который содержит строки с записями актуальных показаний.
+     * <p>Если совершена ошибка в запросе, возвращает статус 400(BAD_REQUEST).</p>
+     */
     @GetMapping(value = "api/actual",produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> actual(HttpServletRequest request){
         HttpSession session = request.getSession();
@@ -43,6 +60,15 @@ public class ActualHistoryController {
         };
     }
 
+    /**
+     * Метод, который обрабатывает запросы POST с адресом "api/actual".
+     *
+     * @param adminSearchDTO DTO запроса администратора
+     * @param request запрос
+     * @return ResponseEntity&lt;Object&gt; - ответ, который содержит строки с записями актуальных показаний.
+     * <p>Если совершена ошибка в запросе, возвращает статус 400(BAD_REQUEST).</p>
+     * <p>Если запрос посылает не администратор, то в ответе будет статус 401(UNAUTHORIZED).</p>
+     */
     @PostMapping(value = "/api/actual", produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> actualForAdmin(@RequestBody AdminSearchDTO adminSearchDTO, HttpServletRequest request) {
         if (request.getSession().getAttribute("role") != Role.ADMIN) {
