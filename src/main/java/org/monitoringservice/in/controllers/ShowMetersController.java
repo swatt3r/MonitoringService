@@ -12,15 +12,33 @@ import org.springframework.web.bind.annotation.RestController;
 
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 
+/**
+ * Класс контроллера, который отвечает за список всех счетчиков.
+ * Обрабатывает запросы GET, с адресом "api/showMeters".
+ */
 @RestController
 public class ShowMetersController {
+    /**
+     * Поле с сервисом для работы со счетчиками.
+     */
     private final MeterService meterService;
 
+    /**
+     * Конструктор для внедерния зависимости.
+     */
     @Autowired
     public ShowMetersController(MeterService meterService) {
         this.meterService = meterService;
     }
 
+    /**
+     * Метод, который обрабатывает запросы GET с адресом "api/showMeters".
+     *
+     * @param request запрос
+     * @return ResponseEntity&lt;Object&gt; - возвращает статус 200(OK). Для пользователя - все его счетчики.
+     * Для администратора - все типы счетчиков.
+     * <p>Если совершена ошибка в запросе, возвращает статус 400(BAD_REQUEST).</p>
+     */
     @GetMapping(value = "api/showMeters",produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> showMeters(HttpServletRequest request){
         HttpSession session = request.getSession();

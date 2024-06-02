@@ -15,15 +15,34 @@ import org.springframework.web.bind.annotation.RestController;
 
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 
+/**
+ * Класс контроллера, который отвечает за историю показаний с указанием месяца.
+ * Обрабатывает запросы POST, с адресом "api/month".
+ */
 @RestController
 public class MonthHistoryController {
+    /**
+     * Поле с сервисом для работы со счетчиками.
+     */
     private final MeterService meterService;
 
+    /**
+     * Конструктор для внедерния зависимости.
+     */
     @Autowired
     public MonthHistoryController(MeterService meterService) {
         this.meterService = meterService;
     }
 
+    /**
+     * Метод, который обрабатывает запросы POST с адресом "api/month".
+     *
+     * @param monthSearchDTO DTO запроса истории за месяц
+     * @param request запрос
+     * @return ResponseEntity&lt;Object&gt; - ответ, который содержит строки
+     * с записями показаний счетчиков за указанный месяц.
+     * <p>Если совершена ошибка в запросе, возвращает статус 400(BAD_REQUEST).</p>
+     */
     @PostMapping(value = "/api/month", produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> month(@RequestBody MonthSearchDTO monthSearchDTO, HttpServletRequest request) {
         HttpSession session = request.getSession();

@@ -13,10 +13,15 @@ import org.springframework.web.filter.GenericFilterBean;
 
 import java.io.IOException;
 
+/**
+ * Класс фильтра, для авторизации. Все запросы, в пути которых встречается "/api/..." будут проходить через этот фильтр.
+ */
 @Component
 @WebFilter("/api/*")
 public class Filter extends GenericFilterBean {
-
+    /**
+     * Метод, который и производит "фильтрацию".
+     */
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
         HttpServletRequest req = (HttpServletRequest) servletRequest;

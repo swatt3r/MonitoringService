@@ -16,15 +16,32 @@ import org.springframework.web.bind.annotation.RestController;
 
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 
+/**
+ * Класс контроллера, который отвечает за подачу новых показаний.
+ * Обрабатывает запросы POST, с адресом "api/readout".
+ */
 @RestController
 public class NewReadoutController {
+    /**
+     * Поле с сервисом для работы со счетчиками.
+     */
     private final MeterService meterService;
-
+    /**
+     * Конструктор для внедерния зависимости.
+     */
     @Autowired
     public NewReadoutController(MeterService meterService) {
         this.meterService = meterService;
     }
-
+    /**
+     * Метод, который обрабатывает запросы POST с адресом "api/readout". Совершает регистрацию новых показаний пользователей.
+     *
+     * @param newReadoutDTO DTO для нового показания
+     * @param request запрос
+     * @return ResponseEntity&lt;Object&gt; - при успешной регистрации нового показаний возвращает статус 200(OK).
+     * <p>Если запрос посылает не пользователь, то в ответе будет статус 401(UNAUTHORIZED).</p>
+     * <p>Если совершена ошибка в запросе, возвращает статус 400(BAD_REQUEST).</p>
+     */
     @PostMapping(value = "/api/readout", produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> readout(@RequestBody NewReadoutDTO newReadoutDTO, HttpServletRequest request) {
         HttpSession session = request.getSession();

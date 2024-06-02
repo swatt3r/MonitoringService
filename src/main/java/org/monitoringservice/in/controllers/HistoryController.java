@@ -16,15 +16,32 @@ import org.springframework.web.bind.annotation.RestController;
 
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 
+/**
+ * Класс контроллера, который отвечает за историю показаний.
+ * Обрабатывает запросы GET и POST, с адресом "api/history".
+ */
 @RestController
 public class HistoryController {
+    /**
+     * Поле с сервисом для работы со счетчиками.
+     */
     private final MeterService meterService;
 
+    /**
+     * Конструктор для внедерния зависимости.
+     */
     @Autowired
     public HistoryController(MeterService meterService) {
         this.meterService = meterService;
     }
 
+    /**
+     * Метод, который обрабатывает запросы GET с адресом "api/history".
+     *
+     * @param request запрос
+     * @return ResponseEntity&lt;Object&gt; - ответ, который содержит строки с записями показаний счетчиков.
+     * Или, если совершена ошибка в запросе, возвращает статус 400(BAD_REQUEST).
+     */
     @GetMapping(value = "api/history",produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> history(HttpServletRequest request){
         HttpSession session = request.getSession();
@@ -43,6 +60,15 @@ public class HistoryController {
         };
     }
 
+    /**
+     * Метод, который обрабатывает запросы POST с адресом "api/history".
+     *
+     * @param adminSearchDTO DTO запроса администратора
+     * @param request запрос
+     * @return ResponseEntity&lt;Object&gt; - ответ, который содержит строки с записями показаний счетчиков.
+     * <p>Если совершена ошибка в запросе, возвращает статус 400(BAD_REQUEST).</p>
+     * <p>Если запрос посылает не администратор, то в ответе будет статус 401(UNAUTHORIZED).</p>
+     */
     @PostMapping(value = "/api/history", produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> historyForAdmin(@RequestBody AdminSearchDTO adminSearchDTO, HttpServletRequest request) {
         if (request.getSession().getAttribute("role") != Role.ADMIN) {
