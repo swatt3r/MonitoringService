@@ -7,7 +7,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.monitoringservice.entities.MeterReading;
 import org.monitoringservice.repositories.MeterRepository;
-import org.monitoringservice.util.MigrationUtil;
 import org.monitoringservice.util.PropertiesUtil;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -46,7 +45,6 @@ public class MeterRepositoryTest {
     @BeforeAll
     static void initRepository() {
         bdContainer.start();
-        MigrationUtil.migrateDB(properties);
 
         meterRepository = new MeterRepository();
     }

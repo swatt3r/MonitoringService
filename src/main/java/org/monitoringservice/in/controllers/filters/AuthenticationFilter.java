@@ -1,15 +1,10 @@
 package org.monitoringservice.in.controllers.filters;
 
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.ServletRequest;
-import jakarta.servlet.ServletResponse;
-import jakarta.servlet.annotation.WebFilter;
+import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Component;
-import org.springframework.web.filter.GenericFilterBean;
 
 import java.io.IOException;
 
@@ -17,8 +12,7 @@ import java.io.IOException;
  * Класс фильтра, для авторизации. Все запросы, в пути которых встречается "/api/..." будут проходить через этот фильтр.
  */
 @Component
-@WebFilter("/api/*")
-public class Filter extends GenericFilterBean {
+public class AuthenticationFilter implements Filter {
     /**
      * Метод, который и производит "фильтрацию".
      */
