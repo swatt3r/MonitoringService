@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Test;
 import org.monitoringservice.entities.Role;
 import org.monitoringservice.entities.User;
 import org.monitoringservice.repositories.UserRepository;
-import org.monitoringservice.util.MigrationUtil;
 import org.monitoringservice.util.PropertiesUtil;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -46,7 +45,6 @@ public class UserRepositoryTest {
     @BeforeAll
     static void initRepository() {
         bdContainer.start();
-        MigrationUtil.migrateDB(properties);
 
         userRepository = new UserRepository();
     }

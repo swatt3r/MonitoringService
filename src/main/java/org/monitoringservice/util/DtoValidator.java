@@ -66,7 +66,7 @@ public class DtoValidator {
                 return "Название типа отсутствует!";
             }
         }catch (NullPointerException e){
-            return "Один из параметров отсутствует!";
+            return "Не указан тип счетчика!";
         }
         return null;
     }
