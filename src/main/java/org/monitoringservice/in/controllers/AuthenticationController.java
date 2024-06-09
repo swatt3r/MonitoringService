@@ -42,7 +42,7 @@ public class AuthenticationController {
      * Метод, который обрабатывает запросы POST с адресом "/login".
      *
      * @param loginDTO DTO информации, нужной для авторизации
-     * @param request запрос
+     * @param request  запрос
      * @return ResponseEntity&lt;Object&gt; - при успешной авторизации, возвращает статус 200(OK).
      * <p>Если совершена ошибка в запросе, возвращает статус 400(BAD_REQUEST).</p>
      */
@@ -72,8 +72,8 @@ public class AuthenticationController {
      * @param request запрос
      * @return ResponseEntity&lt;Object&gt; - аннулирует сеанс и вывозвращает статус 200(OK).
      */
-    @GetMapping(value = "api/logout",produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<Object> logout(HttpServletRequest request){
+    @GetMapping(value = "api/logout", produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<Object> logout(HttpServletRequest request) {
         request.getSession().invalidate();
         return ResponseEntity.ok("Вы вышли из аккаунта!");
     }
@@ -102,7 +102,7 @@ public class AuthenticationController {
                     userDTO.getHouseNumber(),
                     userDTO.getApartmentNumber()
             );
-        }catch (RegistrationException e){
+        } catch (RegistrationException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
         return ResponseEntity.ok("Успешно.");
