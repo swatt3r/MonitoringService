@@ -2,12 +2,10 @@ package org.monitoringservice.services;
 
 import org.monitoringservice.dto.UserDTO;
 import org.monitoringservice.entities.Role;
-import org.monitoringservice.entities.TypeOfAction;
 import org.monitoringservice.entities.User;
 import org.monitoringservice.repositories.UserRepository;
 import org.monitoringservice.services.authexceptions.LoginException;
 import org.monitoringservice.services.authexceptions.RegistrationException;
-import org.monitoringservice.util.annotations.Audit;
 import org.monitoringservice.util.mapper.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -40,7 +38,6 @@ public class AuthenticationService {
      * @return User - пользователь, который вошел в систему с заданным логином и паролем
      * @throws LoginException если неверный пароль или пользователя с таким логином не существует
      */
-    @Audit(typeOfAction = TypeOfAction.Login, haveLogin = true, identifierPos = 0)
     public UserDTO login(String login, String password) throws LoginException {
         User logUser = userRepo.findUserByLogin(login);
         if (logUser == null) {
@@ -65,7 +62,6 @@ public class AuthenticationService {
      * @param apartmentNumber номер квартиры
      * @throws RegistrationException если пользователь с таким именем уже есть или на заданной адрес уже зарегистрирован другой пользователь
      */
-    @Audit(typeOfAction = TypeOfAction.Register, haveLogin = true, identifierPos = 0)
     public void addNewUser(String login, String password, Role role, String city, String street,
                               int houseNumber, int apartmentNumber) throws RegistrationException {
         User regUser = userRepo.findUserByLogin(login);
