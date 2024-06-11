@@ -30,7 +30,7 @@
         <mockitoJUnit.version>5.10.0</mockitoJUnit.version>
         <assertJ.version>3.24.2</assertJ.version>
 
-        <postgresql.version>42.6.0</postgresql.version>
+        <postgresql.version>42.6.1</postgresql.version>
         <liquibase.version>4.25.1</liquibase.version>
 
         <testcontainers.version>1.19.1</testcontainers.version>
