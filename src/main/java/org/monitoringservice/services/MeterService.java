@@ -1,13 +1,11 @@
 package org.monitoringservice.services;
 
 import org.monitoringservice.entities.MeterReading;
-import org.monitoringservice.entities.TypeOfAction;
 import org.monitoringservice.entities.User;
 import org.monitoringservice.repositories.MeterRepository;
 import org.monitoringservice.repositories.UserRepository;
 import org.monitoringservice.services.meterexecptions.MeterAddException;
 import org.monitoringservice.services.meterexecptions.ReadoutException;
-import org.monitoringservice.util.annotations.Audit;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -49,7 +47,6 @@ public class MeterService {
      * @param typeName - название нового типа счетчиков
      * @throws MeterAddException если такой тип счетчика уже зарегистрирован
      */
-    @Audit(typeOfAction = TypeOfAction.NewMeter, haveLogin = false, identifierPos = -1)
     public void addNewType(String typeName) throws MeterAddException {
         List<String> types = meterRepository.findAllMetersTypes();
         if (!types.contains(typeName)) {
@@ -65,7 +62,6 @@ public class MeterService {
      * @param id идентификатор пользователя
      * @return LinkedList - список, который содержит строки с записями актуальных показаний
      */
-    @Audit(typeOfAction = TypeOfAction.Actual, haveLogin = false, identifierPos = 0)
     public LinkedList<String> getUserActual(int id) {
         LinkedList<String> result = new LinkedList<>();
         List<MeterReading> readings = meterRepository.findUserActualHistory(id);
@@ -81,7 +77,6 @@ public class MeterService {
      * @param login логин пользователя, если строка пуста, то поиск будет по всем пользователям
      * @return LinkedList - список, который содержит строки с записями актуальных показаний счетчиков
      */
-    @Audit(typeOfAction = TypeOfAction.Actual, haveLogin = false, identifierPos = -1)
     public LinkedList<String> getActualForAdmin(String login) {
         LinkedList<String> adminActual = new LinkedList<>();
         for (User user : findByLogin(login)) {
@@ -108,7 +103,6 @@ public class MeterService {
      * @param newType название типа счетчика, который нужно добавить
      * @throws MeterAddException если такого типа счетчика не существует или счетчик уже зарегистрирован на пользователя
      */
-    @Audit(typeOfAction = TypeOfAction.AddMeter, haveLogin = false, identifierPos = 0)
     public void addNewMeterToUser(int id, String newType) throws MeterAddException {
         List<String> types = meterRepository.findAllMetersTypes();
         if (!types.contains(newType)) {
@@ -129,7 +123,6 @@ public class MeterService {
      * @param id идентификатор пользователя
      * @return LinkedList - список, который содержит строки с записями актуальных счетчиков
      */
-    @Audit(typeOfAction = TypeOfAction.ShowUserMeter, haveLogin = false, identifierPos = 0)
     public List<String> getUserMeters(int id) {
         return meterRepository.findMetersByUserId(id);
     }
@@ -140,7 +133,6 @@ public class MeterService {
      * @param id идентификатор пользователя
      * @return LinkedList - список, который содержит строки с записями истории показаний
      */
-    @Audit(typeOfAction = TypeOfAction.History, haveLogin = false, identifierPos = 0)
     public List<String> getUserHistory(int id) {
         List<String> result = new LinkedList<>();
         List<MeterReading> readings = meterRepository.findHistoryByUserId(id);
@@ -156,7 +148,6 @@ public class MeterService {
      * @param login логин пользователя, если строка пуста, то поиск будет по всем пользователям
      * @return LinkedList - список, который содержит строки с записями истории пользователей
      */
-    @Audit(typeOfAction = TypeOfAction.History, haveLogin = false, identifierPos = -1)
     public LinkedList<String> getHistoryForAdmin(String login) {
         LinkedList<String> adminHistory = new LinkedList<>();
         for (User user : findByLogin(login)) {
@@ -174,7 +165,6 @@ public class MeterService {
      * @param month месяц
      * @return LinkedList - список, который содержит строки с записями истории показаний, если показания с таким месяцем не найдены, вернет пустой список
      */
-    @Audit(typeOfAction = TypeOfAction.MonthHistory, haveLogin = true, identifierPos = 0)
     public LinkedList<String> getUserMonthHistory(int id, int month) {
         LinkedList<String> result = new LinkedList<>();
         List<MeterReading> readings = meterRepository.findMonthHistoryByUserId(id, month);
@@ -191,7 +181,6 @@ public class MeterService {
      * @param month месяц
      * @return LinkedList - список, который содержит строки с записями истории пользователей, если показания с таким месяцем не найдены, вернет пустой список
      */
-    @Audit(typeOfAction = TypeOfAction.MonthHistory, haveLogin = false, identifierPos = -1)
     public LinkedList<String> getMonthHistoryForAdmin(String login, int month) {
         LinkedList<String> adminMonth = new LinkedList<>();
         for (User user : findByLogin(login)) {
@@ -210,7 +199,6 @@ public class MeterService {
      * @param value значение счетчика
      * @throws ReadoutException если такого типа счетчика не зарегистрировано на пользователя. Если новое показание счетчика неверно. Если запись в данном месяце уже есть
      */
-    @Audit(typeOfAction = TypeOfAction.Readout, haveLogin = false, identifierPos = 0)
     public void newReadout(int id, String type, int value) throws ReadoutException {
         List<String> types = meterRepository.findMetersByUserId(id);
         if (!types.contains(type)) {
