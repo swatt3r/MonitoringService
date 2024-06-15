@@ -71,10 +71,5 @@
                 <constraints nullable="false"/>
             </column>
         </createTable>
-        <createTable tableName="audit" schemaName="util">
-            <column name="message" type="VARCHAR(255)">
-                <constraints nullable="false"/>
-            </column>
-        </createTable>
     </changeSet>
 </databaseChangeLog>

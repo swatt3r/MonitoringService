@@ -6,11 +6,11 @@
 
     <changeSet id="005-addReadout" author="admin">
         <insert tableName="users_meters" schemaName="monitoring">
-            <column name="user_id" value="47"/>
+            <column name="user_id" valueComputed="(SELECT id FROM monitoring.users WHERE login='user')"/>
             <column name="type" value="Heat"/>
         </insert>
         <insert tableName="meter_history" schemaName="monitoring">
-            <column name="user_id" value="47"/>
+            <column name="user_id" valueComputed="(SELECT id FROM monitoring.users WHERE login='user')"/>
             <column name="type" value="Heat"/>
             <column name="date" value="2023-12-19"/>
             <column name="value" valueNumeric="56"/>

@@ -1,8 +1,10 @@
 package org.monitoringservice.repositories;
 
 import org.monitoringservice.entities.MeterReading;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import javax.sql.DataSource;
 import java.sql.*;
 import java.time.LocalDate;
 import java.util.LinkedList;
@@ -12,7 +14,14 @@ import java.util.List;
  * Класс репозитория истории показаний и счетчиков.
  */
 @Repository
-public class MeterRepository implements CustomRepository {
+public class MeterRepository {
+    private final DataSource dataSource;
+
+    @Autowired
+    public MeterRepository(DataSource dataSource) {
+        this.dataSource = dataSource;
+    }
+
     /**
      * Метод получения истории показаний конкретного пользователя из БД.
      *
@@ -23,7 +32,7 @@ public class MeterRepository implements CustomRepository {
         List<MeterReading> result = new LinkedList<>();
         String sql = "SELECT * FROM monitoring.meter_history WHERE user_id = ?";
 
-        try (Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
+        try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
 
             statement.setInt(1, userId);
@@ -46,7 +55,7 @@ public class MeterRepository implements CustomRepository {
         List<String> result = new LinkedList<>();
         String sql = "SELECT type FROM monitoring.users_meters WHERE user_id = ?";
 
-        try (Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
+        try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
 
             statement.setInt(1, userId);
@@ -72,7 +81,7 @@ public class MeterRepository implements CustomRepository {
         List<MeterReading> result = new LinkedList<>();
         String sql = "SELECT * FROM monitoring.meter_history WHERE user_id = ? AND to_char(date , 'MM') = ?;";
 
-        try (Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
+        try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
 
             statement.setInt(1, userId);
@@ -99,7 +108,7 @@ public class MeterRepository implements CustomRepository {
         List<String> result = new LinkedList<>();
         String sql = "SELECT * FROM monitoring.meter_types";
 
-        try (Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
+        try (Connection connection = dataSource.getConnection();
              Statement statement = connection.createStatement()) {
 
             ResultSet resultSet = statement.executeQuery(sql);
@@ -120,7 +129,7 @@ public class MeterRepository implements CustomRepository {
     public void addNewType(String newType) {
         String sql = "INSERT INTO monitoring.meter_types VALUES (?)";
 
-        try (Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
+        try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
 
             statement.setString(1, newType);
@@ -138,7 +147,7 @@ public class MeterRepository implements CustomRepository {
     public void addNewTypeToUser(int userId, String newType) {
         String sql = "INSERT INTO monitoring.users_meters VALUES (?,?)";
 
-        try (Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
+        try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
 
             statement.setInt(1, userId);
@@ -158,7 +167,7 @@ public class MeterRepository implements CustomRepository {
         List<MeterReading> result = new LinkedList<>();
         String sql = "SELECT * FROM monitoring.meter_history WHERE user_id = ? AND type = ? AND date = (SELECT MAX(date) FROM monitoring.meter_history WHERE type = ?)";
 
-        try (Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
+        try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
 
             List<String> userTypes = findMetersByUserId(userId);
@@ -188,7 +197,7 @@ public class MeterRepository implements CustomRepository {
     public void addNewReadout(int userId, String type, LocalDate date, int value) {
         String sql = "INSERT INTO monitoring.meter_history VALUES (?,?,?,?)";
 
-        try (Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
+        try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
 
             statement.setInt(1, userId);

@@ -9,6 +9,7 @@ import org.monitoringservice.entities.Role;
 import org.monitoringservice.entities.User;
 import org.monitoringservice.repositories.UserRepository;
 import org.monitoringservice.util.PropertiesUtil;
+import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
@@ -46,7 +47,13 @@ public class UserRepositoryTest {
     static void initRepository() {
         bdContainer.start();
 
-        userRepository = new UserRepository();
+        DriverManagerDataSource dataSource = new DriverManagerDataSource();
+        dataSource.setDriverClassName(bdContainer.getDriverClassName());
+        dataSource.setUrl((String) properties.get("url"));
+        dataSource.setUsername(bdContainer.getUsername());
+        dataSource.setPassword(bdContainer.getPassword());
+
+        userRepository = new UserRepository(dataSource);
     }
 
     /**
