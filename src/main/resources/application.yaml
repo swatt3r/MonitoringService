@@ -2,4 +2,15 @@ url: jdbc:postgresql://localhost:5432/monitorService
 username: user
 password: secret
 
-changeLogFile: db/changelog/changelog.xml
+spring:
+  liquibase:
+    change-log: classpath:config/liquibase/master.xml
+    enabled: true
+    url: jdbc:postgresql://localhost:5432/monitorService
+    user: user
+    password: secret
+  datasource:
+    url: jdbc:postgresql://localhost:5432/monitorService
+    username: user
+    password: secret
+    driver-class-name: org.postgresql.Driver

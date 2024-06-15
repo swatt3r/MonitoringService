@@ -2,8 +2,10 @@ package org.monitoringservice.repositories;
 
 import org.monitoringservice.entities.Role;
 import org.monitoringservice.entities.User;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import javax.sql.DataSource;
 import java.sql.*;
 import java.util.LinkedList;
 import java.util.List;
@@ -12,7 +14,13 @@ import java.util.List;
  * Класс репозитория пользователей.
  */
 @Repository
-public class UserRepository implements CustomRepository {
+public class UserRepository {
+    DataSource dataSource;
+
+    @Autowired
+    public UserRepository(DataSource dataSource) {
+        this.dataSource = dataSource;
+    }
     /**
      * Метод получения пользователя по логину.
      *
@@ -23,7 +31,7 @@ public class UserRepository implements CustomRepository {
         User result = null;
         String sql = "SELECT * FROM monitoring.users WHERE login = ?";
 
-        try (Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
+        try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
 
             statement.setString(1, login);
@@ -46,7 +54,7 @@ public class UserRepository implements CustomRepository {
         List<User> result = new LinkedList<>();
         String sql = "SELECT * FROM monitoring.users WHERE role NOT IN ('ADMIN')";
 
-        try (Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
+        try (Connection connection = dataSource.getConnection();
              Statement statement = connection.createStatement()) {
 
             ResultSet resultSet = statement.executeQuery(sql);
@@ -72,7 +80,7 @@ public class UserRepository implements CustomRepository {
         User result = null;
         String sql = "SELECT * FROM monitoring.users WHERE city = ? AND street = ? AND apartment = ? AND house = ?";
 
-        try (Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
+        try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
 
             statement.setString(1, city);
@@ -97,7 +105,7 @@ public class UserRepository implements CustomRepository {
     public void save(User user) {
         String sql = "INSERT INTO monitoring.users VALUES (DEFAULT, ?,?,?,?,?,?,?)";
 
-        try (Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
+        try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
 
             statement.setString(1, user.getLogin());

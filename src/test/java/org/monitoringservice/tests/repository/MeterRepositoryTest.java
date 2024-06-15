@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.monitoringservice.entities.MeterReading;
 import org.monitoringservice.repositories.MeterRepository;
 import org.monitoringservice.util.PropertiesUtil;
+import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
@@ -46,7 +47,13 @@ public class MeterRepositoryTest {
     static void initRepository() {
         bdContainer.start();
 
-        meterRepository = new MeterRepository();
+        DriverManagerDataSource dataSource = new DriverManagerDataSource();
+        dataSource.setDriverClassName(bdContainer.getDriverClassName());
+        dataSource.setUrl((String) properties.get("url"));
+        dataSource.setUsername(bdContainer.getUsername());
+        dataSource.setPassword(bdContainer.getPassword());
+
+        meterRepository = new MeterRepository(dataSource);
     }
 
     /**
@@ -60,7 +67,7 @@ public class MeterRepositoryTest {
     @Test
     @DisplayName("Тест получения истории показаний пользователя")
     void findUserHistoryTest() {
-        List<MeterReading> userHistory = meterRepository.findHistoryByUserId(47);
+        List<MeterReading> userHistory = meterRepository.findHistoryByUserId(64);
         assertThat(userHistory.size()).isGreaterThanOrEqualTo(1);
     }
 
@@ -83,7 +90,7 @@ public class MeterRepositoryTest {
     void findUserMonthHistoryTest() {
         List<MeterReading> history = meterRepository.findMonthHistoryByUserId(47, 12);
         assertThat(history.size()).isGreaterThanOrEqualTo(1);
-        MeterReading read = new MeterReading(47, "Heat", LocalDate.of(2023,12,19), 56);
+        MeterReading read = new MeterReading(47, "Heat", LocalDate.of(2023, 12, 19), 56);
         assertThat(history.contains(read))
                 .isEqualTo(true);
     }
